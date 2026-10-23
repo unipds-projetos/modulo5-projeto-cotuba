@@ -1,0 +1,148 @@
+<DOCTYPE html>
+  <html lang="pt-br">
+      <head>
+          <meta charset="UTF-8">
+          <title>Software Design & System Design: 12 - Conhecendo o JMolecules</title>
+      </head>
+      <body>
+       <h1>Software Design &amp; System Design: 12 - Conhecendo o JMolecules</h1>
+<h2>1. Dados sobre a Aula</h2>
+<ul>
+<li><strong>Título Alternativo:</strong> Materializando o DDD no Código: Governança Arquitetural com jMolecules e ArchUnit.</li>
+<li><strong>Tópico Central:</strong> Implementação de padrões do <strong>DDD Tático</strong> (<code>Entity</code>, <code>Value Object</code>, <code>Aggregate Root</code>, <code>Repository</code>, <code>Service</code>) de forma agnóstica a frameworks de infraestrutura (como Spring ou Hibernate) utilizando a biblioteca <strong>jMolecules</strong>, e a validação contínua dessas regras utilizando o <strong>ArchUnit</strong>.</li>
+<li><strong>Problema de Design:</strong> Como evitar a degradação arquitetural e o &quot;Furacão Tático&quot;. O problema resolvido é a falta de rastreabilidade do design no código-fonte. Sem metadados claros, os desenvolvedores quebram as regras do DDD (ex: Entidades sem identidade, Repositórios acoplados a banco de dados em vez de coleções de domínio) e a arquitetura entra em colapso silenciosamente.</li>
+</ul>
+<h2>2. Passo a Passo Cronológico</h2>
+<p><strong>[00:00 - 01:50] Setup e o Conceito de Governança como Código</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> O Arquiteto não deve depender apenas de documentação (PDFs, wikis) para garantir que a arquitetura seja seguida. Utilizando <code>jMolecules</code> (para anotar as intenções arquiteturais) e <code>ArchUnit</code> (para testar essas intenções no CI/CD), criamos uma <strong>Função de Adequação (<em>Fitness Function</em>)</strong>. O código se auto-valida.</li>
+<li><strong>Implementação de Código Java (A Regra de Ouro):</strong></li>
+</ul>
+<pre><code class="language-java">import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.lang.ArchRule;
+import org.jmolecules.archunit.JMoleculesArchitectureRules;
+import org.jmolecules.archunit.JMoleculesDddRules;
+
+// Classe que garante que as regras do DDD nunca sejam violadas
+@AnalyzeClasses(packages = &quot;expert.os.examples&quot;)
+public class ArchitectureValidationTest {
+
+    @ArchTest
+    ArchRule dddRules = JMoleculesDddRules.all(); // Valida Entities, Aggregates, Value Objects...
+
+    @ArchTest
+    ArchRule layerRules = JMoleculesArchitectureRules.ensureLayering(); // Valida isolamento de camadas
+}
+</code></pre>
+<p><strong>[01:51 - 03:35] Modelando uma Entity e Protegendo a Identidade</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> Uma <code>Entity</code> no DDD não é uma tabela de banco de dados (isso seria <code>@jakarta.persistence.Entity</code>). Uma Entidade no domínio é um objeto cujo ciclo de vida possui continuidade e é distinguido pela sua <strong>Identidade</strong>, não pelos seus atributos. Se uma classe é anotada como <code>@Entity</code>, o ArchUnit exigirá que ela tenha um atributo marcado com <code>@Identity</code>.</li>
+<li><strong>Implementação de Código Java:</strong></li>
+</ul>
+<pre><code class="language-java">import org.jmolecules.ddd.annotation.Entity;
+import org.jmolecules.ddd.annotation.Identity;
+
+@Entity
+public class Card {
+    
+    // O jMolecules/ArchUnit forçará a existência de um identificador.
+    // Sem ele, o build falha.
+    @Identity 
+    private String id;
+    
+    private String number;
+    private String holderName;
+    
+    // ... construtores e métodos de negócio
+}
+</code></pre>
+<p><strong>[03:36 - 05:33] Value Objects: O Fim da Obsessão por Primitivos</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> Um <code>ValueObject</code> mede, quantifica ou descreve uma coisa no domínio. Ele <strong>não possui identidade</strong> e é imutável. Se dois Value Objects têm os mesmos atributos, eles são a mesma coisa. O professor demonstra de forma muito inteligente que <strong>Enums</strong> em Java são casos de uso perfeitos para Value Objects simples.</li>
+<li><strong>Implementação de Código Java:</strong></li>
+</ul>
+<pre><code class="language-java">import org.jmolecules.ddd.annotation.ValueObject;
+
+// Enums são imutáveis por natureza e comparados por valor, 
+// encaixando-se perfeitamente no conceito de Value Object do DDD.
+@ValueObject
+public enum CreditCardType {
+    VISA,
+    MASTERCARD
+}
+</code></pre>
+<p><strong>[05:34 - 06:50] Aggregate Root: A Fronteira de Consistência</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> O <code>Aggregate Root</code> (Raiz de Agregação) é uma Entidade especial. Ela atua como um portão de entrada (Gateway) para um grupo de objetos relacionados. O domínio externo nunca deve manipular um objeto interno diretamente; toda orquestração de regras de negócio passa pelo Aggregate Root.</li>
+<li><strong>Implementação de Código Java:</strong></li>
+</ul>
+<pre><code class="language-java">import org.jmolecules.ddd.annotation.AggregateRoot;
+import java.util.List;
+
+// Order orquestra seus Products. Outras partes do sistema não 
+// devem alterar os products sem passar pelas regras de negócio da Order.
+@AggregateRoot
+public class Order {
+    
+    @Identity
+    private String id;
+    
+    private List&lt;Product&gt; products;
+    
+    // ... métodos de delegação e proteção de invariantes
+}
+</code></pre>
+<p><strong>[06:51 - 09:55] Repository vs. DAO (Data Access Object)</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> Esta é uma das confusões mais clássicas da engenharia de software.
+<ul>
+<li><strong>DAO (Padrão de Infraestrutura):</strong> Abstrai operações puras de banco de dados (<code>insert</code>, <code>update</code>, <code>delete</code>). É focado em tabelas.</li>
+<li><strong>Repository (Padrão de Domínio - DDD):</strong> Emula uma <strong>coleção de objetos em memória</strong> (<code>save</code>, <code>findById</code>, <code>findAll</code>). O domínio não sabe e não se importa se os dados vão para o MySQL, Kafka ou um arquivo de texto.</li>
+</ul>
+</li>
+<li><strong>Implementação de Código Java:</strong></li>
+</ul>
+<pre><code class="language-java">import org.jmolecules.ddd.annotation.Repository;
+
+// Interface puramente orientada ao domínio. Não vaza JDBC, JPA ou SQL.
+@Repository
+public interface CreditCardRepository {
+    
+    // Lida com o objeto de domínio (Card), não com a tabela do banco
+    void save(Card card);
+    
+    Card findById(String id);
+}
+</code></pre>
+<ul>
+<li><strong>Explicação da Lógica:</strong> O jMolecules permite expressar que essa interface é um Repositório do Domínio. A implementação real (<code>CreditCardRepositoryImpl</code> usando Spring Data ou Hibernate) residirá em uma camada externa (Infrastructure Layer), mantendo o <em>Core Domain</em> livre de acoplamento tecnológico.</li>
+</ul>
+<p><strong>[09:56 - 11:30] Domain Services e Camadas Arquiteturais</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> Quando uma operação de negócio não pertence naturalmente a nenhuma Entidade ou Value Object (pois orquestra múltiplos agregados), extraímos isso para um <code>Domain Service</code>.</li>
+<li>Além disso, o jMolecules oferece anotações puras para mapear estilos arquiteturais baseados em camadas (Clean Architecture, Onion, Hexagonal) como <code>@ApplicationLayer</code>, <code>@DomainLayer</code> e <code>@InfrastructureLayer</code>.</li>
+</ul>
+<h2>3. Principais Conceitos</h2>
+<ul>
+<li><strong>jMolecules:</strong> Um projeto inovador para a comunidade Java. É um conjunto de anotações e interfaces puras (sem dependências pesadas) que permite aos desenvolvedores expressar conceitos arquiteturais (DDD, Onion Architecture) diretamente no código, servindo como documentação viva.</li>
+<li><strong>ArchUnit:</strong> Biblioteca de testes em Java focada na verificação de arquitetura. Permite escrever testes unitários que falham se regras de design de software (ex: &quot;A camada de Domínio não pode importar o pacote <code>java.sql</code>&quot;) forem violadas.</li>
+<li><strong>Entity (Entidade Tática):</strong> Objeto de domínio focado na rastreabilidade e continuidade. Duas entidades são iguais se, e somente se, seus IDs forem iguais, independentemente do resto de seus atributos.</li>
+<li><strong>Value Object:</strong> Objeto imutável distinguido apenas pelo estado de seus atributos. Ideal para representar Moedas (Money), Tipos sanguíneos, CEPs ou, como na aula, Tipos de Cartão (<code>CreditCardType</code>).</li>
+<li><strong>Repository vs DAO:</strong> Repository lida com objetos inteiros e ricos (Aggregates) da perspectiva do Domínio (&quot;Adicione este Cartão à minha coleção&quot;). DAO lida com a granularidade da persistência do banco de dados relacional (&quot;Faça um INSERT na tabela X&quot;).</li>
+</ul>
+<h2>4. Resumo para Fixação</h2>
+<h3>🚨 Armadilhas Comuns (Pitfalls)</h3>
+<ol>
+<li><strong>Framework-Driven Development disfarçado de DDD:</strong> O maior erro é achar que anotar uma classe com <code>@javax.persistence.Entity</code> e herdar de <code>JpaRepository</code> do Spring Data significa estar fazendo DDD. Essas anotações pertencem à camada de <strong>Infraestrutura</strong>, não de Domínio. O <code>jMolecules</code> resolve isso entregando anotações puramente conceituais.</li>
+<li><strong>Entidades sem Identidade Clara:</strong> Criar classes de domínio e esquecer de definir rigorosamente o que a torna única. O ArchUnit, junto com o jMolecules, trava o <em>build</em> apontando exatamente qual classe esqueceu o <code>@Identity</code>.</li>
+<li><strong>Vazamento de Detalhes de Persistência no Repositório:</strong> Construir Repositórios no Domínio recebendo lógicas de banco (ex: <code>salvarComTransacao(Connection conn, Card card)</code>). O Repositório do domínio só deve conhecer a linguagem do negócio.</li>
+</ol>
+<h3>🛡️ Princípios e Orientação a Objetos</h3>
+<ul>
+<li><strong>Separation of Concerns (Separação de Preocupações):</strong> A aula demonstra a clara distinção entre as intenções do domínio (o que o sistema deve fazer) e as implementações técnicas (como o banco de dados vai salvar isso).</li>
+<li><strong>Automation of Design Rules (Fitness Functions):</strong> O princípio mais moderno de arquitetura ágil demonstrado na aula: regras de arquitetura não devem viver na boca do &quot;Tech Lead&quot;, mas automatizadas no pipeline do Git (via ArchUnit + jMolecules) para escalar a segurança arquitetural da equipe.</li>
+</ul>
+
+      </body>
+  </html>

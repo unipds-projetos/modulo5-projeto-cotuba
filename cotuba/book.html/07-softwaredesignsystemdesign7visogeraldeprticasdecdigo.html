@@ -1,0 +1,163 @@
+<DOCTYPE html>
+  <html lang="pt-br">
+      <head>
+          <meta charset="UTF-8">
+          <title>Software Design & System Design: 7 - Visão Geral de Práticas de Código</title>
+      </head>
+      <body>
+       <h1>Software Design &amp; System Design: 7 - Visão Geral de Práticas de Código</h1>
+<h2>1. Dados sobre a Aula</h2>
+<ul>
+<li><strong>Título Alternativo:</strong> Fundamentos de Code Design: Princípios Essenciais (KISS, YAGNI, DRY), Acoplamento e Proteção de Invariantes.</li>
+<li><strong>Tópico Central:</strong> Princípios fundamentais de escrita de código Orientado a Objetos que antecedem os Padrões de Projeto. Foco na eliminação de &quot;Code Smells&quot; (Primitive Obsession, God Class) e na transição de um Modelo Anêmico para um Modelo de Domínio Rico (Rich Domain Model).</li>
+<li><strong>Problema de Design:</strong> Como evitar a dívida técnica gerada por <em>Overengineering</em> (Complexidade Acidental), vazamento de escopo (<em>Train Wrecks</em>), acoplamento forte por herança indevida e quebra de encapsulamento do estado interno dos objetos.</li>
+</ul>
+<h2>2. Passo a Passo Cronológico</h2>
+<p><strong>[01:21 - 03:45] A &quot;Teoria Musical&quot; do Software Design</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> Antes de decorar Padrões de Projeto (Design Patterns) de forma cega, é preciso entender os <strong>Princípios</strong>. O professor usa a analogia musical: aprender os princípios (escala, notas) permite que você entenda o <em>porquê</em> de um acorde (Design Pattern) existir. Decorar padrões sem entender princípios leva ao <em>Overengineering</em>.</li>
+</ul>
+<p><strong>[16:33 - 19:12] KISS &amp; YAGNI: O Combate ao Overengineering</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong>
+<ul>
+<li><strong>KISS (Keep It Simple, Stupid):</strong> A simplicidade é o último grau da sofisticação. Evite abstrações precoces. O professor destaca o anti-pattern de criar uma <code>Interface</code> quando só existirá uma única implementação. Use uma classe simples e refatore para interface <em>apenas quando necessário</em>.</li>
+<li><strong>YAGNI (You Aren't Gonna Need It):</strong> Otimização prematura é a raiz de todo o mal. Não adicione código hoje para uma <em>feature</em> que &quot;talvez&quot; seja necessária no futuro.</li>
+</ul>
+</li>
+</ul>
+<p><strong>[19:13 - 21:13] DRY (Don't Repeat Yourself) - Reuso de Conhecimento</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> DRY não é apenas sobre não copiar e colar linhas de código, mas sobre <strong>não duplicar o conhecimento/regra de negócio</strong>.</li>
+<li><strong>Implementação de Código Java (O Anti-Pattern):</strong></li>
+</ul>
+<pre><code class="language-java">// Anti-Pattern: Lógica de negócio (cálculo de 10%) espalhada
+class CheckoutService {
+    BigDecimal calculateFinalPrice(BigDecimal price) {
+        // A regra de negócio vaza para o serviço
+        return price.subtract(price.multiply(BigDecimal.valueOf(0.10))); 
+    }
+}
+
+class PromotionService {
+    BigDecimal promoPrice(BigDecimal price) {
+        // Duplicação do conhecimento do que é o desconto
+        return price.subtract(price.multiply(BigDecimal.valueOf(0.10))); 
+    }
+}
+</code></pre>
+<p><strong>[21:14 - 25:09] Make a Type (DDD: Evitando Primitive Obsession com Value Objects)</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> Em DDD, chamamos isso de <strong>Value Object</strong> e combate ao <em>Primitive Obsession</em>. Se um valor primitivo (<code>double</code>, <code>BigDecimal</code>, <code>String</code>) tem comportamento, regras de validação ou significado para o domínio, ele deve virar um Tipo (Classe).</li>
+<li><strong>Implementação de Código Java (A Refatoração para Domínio Rico):</strong></li>
+</ul>
+<pre><code class="language-java">// DDD Concept: Value Object representando um conceito do Domínio
+public class Discount {
+    public static final Discount NONE = new Discount(&quot;No Discount&quot;, 0.0);
+    
+    private final String reason;
+    private final double rate;
+
+    // Construtor, validações...
+
+    // O Comportamento (cálculo) pertence ao próprio tipo! (Rich Model)
+    public MonetaryAmount applyTo(MonetaryAmount price) {
+        return price.multiply(1.0 - rate);
+    }
+}
+
+// O Serviço agora apenas orquestra, não calcula (Alta Coesão)
+class CheckoutService {
+    public MonetaryAmount calculateFinalPrice(MonetaryAmount price, Discount discount) {
+        return discount.applyTo(price);
+    }
+}
+</code></pre>
+<ul>
+<li><strong>Explicação da Lógica:</strong> Tiramos o cálculo da camada anêmica de Serviço e encapsulamos no objeto <code>Discount</code>. Isso garante que qualquer lugar do sistema que precise aplicar um desconto use a mesma regra, centralizada e testável.</li>
+</ul>
+<p><strong>[25:10 - 26:01] Composition Over Inheritance (Composição sobre Herança)</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> Herança deve ser usada apenas para relações de &quot;É UM&quot; (<em>Is-a</em>), nunca apenas para reutilizar código.</li>
+<li><strong>Implementação de Código Java:</strong></li>
+</ul>
+<pre><code class="language-java">// Anti-Pattern Bizarro (Herança por conveniência)
+class Sea {
+    boolean hasSalt() { return true; }
+}
+
+class Cake extends Sea { 
+    // Errado! Um bolo NÃO É um mar. Quebra o Princípio de Liskov (SOLID).
+}
+
+// Refatoração (Composição - &quot;TEM UM&quot;)
+class Cake {
+    private Salt salt = new Salt(); // Bolo TEM sal
+}
+</code></pre>
+<p><strong>[26:02 - 27:49] Law of Demeter (Princípio do Menor Conhecimento)</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> Um objeto só deve conversar com seus &quot;amigos diretos&quot;, não com &quot;estranhos&quot;.</li>
+<li><strong>Implementação de Código Java (Evitando Train Wrecks):</strong></li>
+</ul>
+<pre><code class="language-java">// Anti-Pattern: Train Wreck (Acoplamento profundo)
+// O Order precisa saber a estrutura interna de Customer e Address. Se Address mudar, Order quebra.
+String zip = order.getCustomer().getAddress().getZipCode();
+
+// Refatoração Correta (Delegação)
+// Order expõe apenas o que é necessário.
+String zip = order.getZipCode(); 
+</code></pre>
+<p><strong>[27:50 - 29:12] Coesão vs Acoplamento (God Class)</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> Alta coesão (foco em uma única tarefa clara) e baixo acoplamento (saber o mínimo possível sobre outras classes).</li>
+<li><strong>O Anti-Pattern (God Service Class):</strong> Uma classe <code>UserService</code> que faz registro (lógica de usuário), envia e-mail (infraestrutura), gera PDF (relatório) e loga no sistema. Ela fere o <strong>Single Responsibility Principle (SRP)</strong> do SOLID.</li>
+</ul>
+<p><strong>[29:13 - 31:00] Encapsulamento (DDD: Protegendo os Invariantes do Aggregate Root)</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> No DDD, uma Entidade Raiz (<em>Aggregate Root</em>) deve proteger seu estado interno (Invariantes). Vazamento de referências de memória permite que outras classes alterem o estado sem passar pelas regras de negócio.</li>
+<li><strong>Implementação de Código Java (CRÍTICO):</strong></li>
+</ul>
+<pre><code class="language-java">// Exemplo clássico de Aggregate Root no DDD
+public class Order {
+    private final List&lt;Item&gt; items = new ArrayList&lt;&gt;();
+
+    // Comportamento rico: Apenas a Order sabe como adicionar um item (regras de limite, preço, etc)
+    public void addItem(Item item) {
+        // Validações de negócio, regras de pricing...
+        items.add(item);
+    }
+
+    // PROTEÇÃO DE INVARIANTE: 
+    // Se retornássemos a lista original, qualquer um faria order.getItems().add(...) burlando o método addItem().
+    public List&lt;Item&gt; getItems() {
+        return Collections.unmodifiableList(items);
+    }
+}
+</code></pre>
+<ul>
+<li><strong>Explicação da Lógica:</strong> O professor usa <code>Collections.unmodifiableList</code> (ou <code>List.copyOf</code> nas versões mais recentes do Java). Isso blinda a classe <code>Order</code>. Nenhuma outra classe consegue manipular a lista de itens diretamente, forçando o uso do método de negócio <code>addItem()</code>.</li>
+</ul>
+<h2>3. Principais Conceitos</h2>
+<ul>
+<li><strong>Value Object (Objeto de Valor):</strong> Um pequeno objeto que representa um conceito descritivo do domínio sem identidade conceitual (ex: <code>Discount</code>, <code>Money</code>, <code>ZipCode</code>). Eles encapsulam primitivos (<em>Primitive Obsession</em>) e suas lógicas de formatação/cálculo. Devem ser <strong>imutáveis</strong>.</li>
+<li><strong>Rich Domain Model (Modelo de Domínio Rico):</strong> Abordagem onde a lógica de negócios, validações e comportamentos residem diretamente nas Entidades e Value Objects, em oposição ao <em>Modelo Anêmico</em>, onde entidades são apenas sacos de <em>getters/setters</em> e a lógica fica em &quot;Services&quot;.</li>
+<li><strong>Aggregate Root (Raiz de Agregação):</strong> (Exemplificado pela classe <code>Order</code>). É a principal entidade que controla o acesso e garante a consistência (invariantes) dos objetos filhos (como <code>Item</code>). Acesso a coleções internas deve ser sempre em modo <em>read-only</em>.</li>
+<li><strong>God Class (Classe Deus):</strong> Um <em>Code Smell</em> onde uma classe centraliza excessiva responsabilidade (fere a Coesão). Fica enorme, difícil de ler, testar e manter.</li>
+</ul>
+<h2>4. Resumo para Fixação</h2>
+<h3>🚨 Armadilhas Comuns (Pitfalls)</h3>
+<ol>
+<li><strong>Primitive Obsession (Obsessão por Primitivos):</strong> Usar <code>BigDecimal</code> para representar Preço e Desconto em todo o sistema. Isso espalha a lógica matemática (como na aula) e impede a evolução do código. Crie os tipos <code>MonetaryAmount</code> e <code>Discount</code>.</li>
+<li><strong>Train Wreck (Acoplamento em Cadeia):</strong> Encadeamentos como <code>a.getB().getC().doSomething()</code>. Isso torna o código extremamente frágil. Se a estrutura de <code>B</code> mudar, <code>A</code> quebra, mesmo que não devesse se importar com a estrutura de <code>B</code>. Aplique a <strong>Lei de Demeter</strong> delegando métodos.</li>
+<li><strong>Vazamento de Referência de Coleção:</strong> Retornar listas internas diretamente via <em>Getters</em>. Um desenvolvedor desavisado pode modificar a lista de fora da entidade, pulando as regras de negócio de inclusão.</li>
+</ol>
+<h3>🛡️ Princípios de Orientação a Objetos</h3>
+<ul>
+<li><strong>SRP (Single Responsibility Principle):</strong> Mencionado no combate à <em>God Class</em> (<code>UserService</code>). Cada classe deve ter apenas uma razão para mudar.</li>
+<li><strong>LSP (Liskov Substitution Principle):</strong> Abordado indiretamente no erro absurdo do <code>Cake extends Sea</code>. Subtipos devem ser substituíveis por seus tipos base. Um bolo não pode substituir um mar.</li>
+<li><strong>Encapsulamento / Information Hiding:</strong> Não é apenas colocar atributos como <code>private</code>. É esconder os detalhes de <em>como</em> o objeto trabalha internamente, forçando o mundo externo a interagir apenas através de métodos de negócio com intenção clara (<code>applyTo()</code>, <code>addItem()</code>).</li>
+</ul>
+
+      </body>
+  </html>

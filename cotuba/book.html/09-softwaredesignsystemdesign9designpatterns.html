@@ -1,0 +1,157 @@
+<DOCTYPE html>
+  <html lang="pt-br">
+      <head>
+          <meta charset="UTF-8">
+          <title>Software Design & System Design: 9 - Design Patterns</title>
+      </head>
+      <body>
+       <h1>Software Design &amp; System Design: 9 - Design Patterns</h1>
+<h2>1. Dados sobre a Aula</h2>
+<ul>
+<li><strong>Título Alternativo:</strong> A Anatomia dos Design Patterns: Resolvendo Probleos Recorrentes com Princípios de OO.</li>
+<li><strong>Tópico Central:</strong> Visão estrutural dos Padrões de Projeto (Design Patterns) do Gang of Four (GoF) – Criacionais, Estruturais e Comportamentais – e como eles emergem dos princípios da Orientação a Objetos.</li>
+<li><strong>Problema de Design:</strong> Como gerenciar a criação complexa de objetos garantindo imutabilidade (Builder), como remover ramificações condicionais infinitas (<code>if/else</code>) mudando comportamento em tempo de execução (Strategy), e como evitar o vazamento de estado global e alto acoplamento (o dilema do Singleton).</li>
+</ul>
+<h2>2. Passo a Passo Cronológico</h2>
+<p><strong>[00:00 - 04:54] A &quot;Teoria Musical&quot; do Software Design e Princípios OO</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> O professor ressalta que Padrões de Projeto não devem ser decorados de forma cega. Eles são &quot;templates&quot; que emergem naturalmente quando você aplica princípios sólidos de Orientação a Objetos. Se você focar em <strong>Encapsular o que varia</strong>, <strong>Favorecer Composição sobre Herança</strong> e <strong>Programar para Interfaces</strong>, os padrões nascerão no seu código.</li>
+</ul>
+<p><strong>[06:25 - 10:08] Singleton Pattern: O Dilema da Instância Única</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> Garante que uma classe tenha apenas uma instância e provê um ponto de acesso global a ela. O professor levanta a discussão clássica: <em>Singleton é um Anti-Pattern?</em> Ele pode quebrar a testabilidade, esconder dependências e gerar estado global problemático. No entanto, é vital para recursos caros, como Pools de Conexão.</li>
+<li><strong>Decisão Arquitetural e Implementação (Java):</strong> Hoje, não implementamos o Singleton manualmente (com construtor privado e método <code>getInstance()</code> com <code>synchronized</code>). Delegamos isso para o motor de Injeção de Dependências (CDI ou Spring).</li>
+</ul>
+<pre><code class="language-java">// BEST PRACTICE: Delegando o Singleton para o Container (Inversion of Control)
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped // No Spring seria @Component / @Service
+public class DatabaseConnectionPool {
+    
+    // O Container garante que apenas UMA instância viva na aplicação inteira
+    public Connection getConnection() {
+        // lógica de pool de conexões
+        return new Connection();
+    }
+}
+</code></pre>
+<ul>
+<li><strong>Explicação da Lógica:</strong> Usar anotações de escopo (<code>@ApplicationScoped</code>) resolve os problemas clássicos do Singleton manual. Mantém a classe altamente testável (você pode instanciá-la num teste unitário com um simples <code>new</code>) e evita o uso de dependências globais escondidas.</li>
+</ul>
+<p><strong>[10:09 - 11:03] Factory Pattern: Desacoplando a Construção</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> Delega a responsabilidade da criação de objetos (o <code>new</code>) para uma classe ou método de fábrica. Isso desacopla a regra de instanciação da lógica de negócio.</li>
+<li><strong>Implementação de Código Java:</strong></li>
+</ul>
+<pre><code class="language-java">public interface PaymentProcessor {
+    void process(MonetaryAmount amount);
+}
+
+// A classe de negócio não sabe QUAIS implementações existem, apenas usa a Fábrica
+public class PaymentFactory {
+    
+    public static PaymentProcessor createProcessor(String method) {
+        return switch (method) {
+            case &quot;CREDIT_CARD&quot; -&gt; new CreditCardProcessor();
+            case &quot;PIX&quot; -&gt; new PixProcessor();
+            default -&gt; throw new IllegalArgumentException(&quot;Unknown method&quot;);
+        };
+    }
+}
+</code></pre>
+<p><strong>[11:04 - 12:20] Strategy Pattern: Comportamento Dinâmico sem Ifs</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> Permite variar o comportamento de um algoritmo em tempo de execução sem modificar a classe que o utiliza. É a cura definitiva para o código cheio de blocos <code>if/else</code> ou <code>switch</code>. Ele atende perfeitamente ao princípio <strong>Open/Closed</strong>.</li>
+<li><strong>Implementação de Código Java (via Interfaces e Polimorfismo):</strong></li>
+</ul>
+<pre><code class="language-java">// 1. A interface Strategy
+public interface ShippingStrategy {
+    MonetaryAmount calculate(Order order);
+}
+
+// 2. As implementações concretas (Fechadas para modificação)
+public class SedexShipping implements ShippingStrategy {
+    public MonetaryAmount calculate(Order order) { /* lógica sedex */ }
+}
+
+// 3. O Contexto (O Serviço)
+public class CheckoutService {
+    // O comportamento é injetado dinamicamente
+    public MonetaryAmount calculateTotal(Order order, ShippingStrategy shippingMethod) {
+        return shippingMethod.calculate(order);
+    }
+}
+</code></pre>
+<p><strong>[12:56 - 16:04] Builder Pattern: Objetos Complexos e Imutabilidade</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> Utilizado quando uma classe precisa de muitos parâmetros na criação (o anti-pattern do <em>Telescoping Constructor</em>). O Builder não apenas limpa a instanciação, mas em DDD, é a ferramenta perfeita para garantir a <strong>Imutabilidade</strong> de um <em>Value Object</em> ou <em>Aggregate Root</em>.</li>
+<li><strong>Implementação de Código Java:</strong></li>
+</ul>
+<pre><code class="language-java">public class UserAccount {
+    // Campos finais garantem que, uma vez criado, o objeto é imutável
+    private final String username;
+    private final String email;
+    private final String role; // opcional
+
+    // Construtor privado: Ninguém dá 'new' diretamente na entidade
+    private UserAccount(Builder builder) {
+        this.username = builder.username;
+        this.email = builder.email;
+        this.role = builder.role;
+    }
+
+    public static class Builder {
+        private String username;
+        private String email;
+        private String role = &quot;GUEST&quot;; // Default
+
+        public Builder username(String username) {
+            this.username = username; return this;
+        }
+        public Builder email(String email) {
+            this.email = email; return this;
+        }
+        public Builder role(String role) {
+            this.role = role; return this;
+        }
+
+        public UserAccount build() {
+            // Validações de negócio ocorrem AQUI, antes da criação real
+            Objects.requireNonNull(username);
+            Objects.requireNonNull(email);
+            return new UserAccount(this);
+        }
+    }
+}
+
+// Uso fluente:
+// UserAccount user = new UserAccount.Builder().username(&quot;otavio&quot;).email(&quot;o@os.com&quot;).build();
+</code></pre>
+<p><strong>[17:17 - 19:28] Padrões Estruturais: Decorator e Proxy</strong></p>
+<ul>
+<li><strong>Decorator:</strong> Adiciona responsabilidades a um objeto dinamicamente sem alterar seu código-fonte, englobando-o em um &quot;Wrapper&quot;. Aplica o princípio de <em>Composição sobre Herança</em>.</li>
+<li><strong>Proxy:</strong> Um representante (ou substituto) que controla o acesso ao objeto real. O professor destaca que frameworks modernos (Hibernate para Lazy Loading, Spring/CDI para transações via <code>@Transactional</code>) baseiam-se pesadamente na geração de Proxies em tempo de execução (via CGLIB ou Byte Buddy).</li>
+</ul>
+<h2>3. Principais Conceitos</h2>
+<ul>
+<li><strong>GoF (Gang of Four):</strong> Referência aos autores do livro &quot;Design Patterns&quot; de 1994, que catalogaram 23 soluções padronizadas. Dividem-se em: <strong>Criacionais</strong> (lidam com a instanciação), <strong>Estruturais</strong> (lidam com a composição de classes) e <strong>Comportamentais</strong> (lidam com a comunicação e fluxo de controle).</li>
+<li><strong>Telescoping Constructor:</strong> Um <em>Code Smell</em> onde uma classe possui múltiplos construtores encadeados (<code>Construtor(A)</code>, <code>Construtor(A, B)</code>, <code>Construtor(A, B, C)</code>). Resolvido com o padrão <strong>Builder</strong>.</li>
+<li><strong>Lazy Loading:</strong> Conceito onde a inicialização ou a busca de um recurso caro (como dados do banco) é adiada até o momento em que é estritamente necessária. Geralmente implementado através do padrão <strong>Proxy</strong>.</li>
+<li><strong>Inversion of Control (IoC):</strong> Princípio em que o fluxo de controle de um sistema é invertido: em vez do seu código instanciar as dependências (<code>new Servico()</code>), um <em>Container</em> (como Spring ou Jakarta EE) as cria e as injeta para você.</li>
+</ul>
+<h2>4. Resumo para Fixação</h2>
+<h3>🚨 Armadilhas Comuns (Pitfalls)</h3>
+<ol>
+<li><strong>O Abuso do Singleton Manual:</strong> Criar classes com <code>public static MeuServico getInstance()</code> cria dependências fortíssimas no código, dificultando imensamente a criação de <em>Mocks</em> durante os testes de unidade. <strong>Solução:</strong> Use Injeção de Dependência.</li>
+<li><strong>Lógica Procedural Presa em Regras de Negócio:</strong> Ter métodos inchados com múltiplos <code>if (tipo == A) { ... } else if (tipo == B) { ... }</code>. Toda vez que um novo tipo nasce, você precisa modificar a classe principal, arriscando quebrar o que já funcionava. <strong>Solução:</strong> Padrão Strategy.</li>
+<li><strong>Falta de Caching e Gargalos em Lotes (Memory Leaks):</strong> O professor contou uma anedota de um processo de <em>Batch</em> que recriava recursos caros via SPI sem fazer cache, estourando a memória (<code>OutOfMemoryError</code>). O uso de Padrões Criacionais (Singleton ou Cache Proxies) é vital para preservar a <em>Performance</em> em loops pesados.</li>
+</ol>
+<h3>🛡️ Princípios de Orientação a Objetos</h3>
+<ul>
+<li><strong>Open/Closed Principle (Princípio Aberto/Fechado do SOLID):</strong> O Padrão <strong>Strategy</strong> é a personificação deste princípio. Você pode adicionar novas estratégias de frete ou pagamento apenas criando novas classes (aberto para extensão), sem tocar na classe de <code>Checkout</code> existente (fechada para modificação).</li>
+<li><strong>Favor Composition Over Inheritance:</strong> Mencionada fortemente ao lado dos padrões estruturais como o <strong>Decorator</strong>. Estender classes base para obter reaproveitamento de código gera o anti-pattern do Acoplamento Forte (Fragile Base Class). Decoradores encapsulam instâncias (&quot;TEM UM&quot;) no lugar de herdá-las (&quot;É UM&quot;).</li>
+<li><strong>Encapsulate What Varies:</strong> O Princípio basilar por trás do <strong>Factory Pattern</strong>. Se a forma de criar um objeto muda com base em regras dinâmicas, retire essa lógica da sua classe de negócio e isole-a em uma fábrica especializada.</li>
+</ul>
+
+      </body>
+  </html>

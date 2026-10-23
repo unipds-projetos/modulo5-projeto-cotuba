@@ -1,0 +1,117 @@
+<DOCTYPE html>
+  <html lang="pt-br">
+      <head>
+          <meta charset="UTF-8">
+          <title>Software Design & System Design: 6 - Exemplos e Visão de Geral de Cases de System Design</title>
+      </head>
+      <body>
+       <h1>Software Design &amp; System Design: 6 - Exemplos e Visão de Geral de Cases de System Design</h1>
+<h2>1. Dados sobre a Aula</h2>
+<ul>
+<li><strong>Título Alternativo:</strong> System Design na Prática: Desconstruindo E-commerces, Sistemas de Reserva e Redes Sociais.</li>
+<li><strong>Tópico Central:</strong> A transição da teoria para a prática utilizando o <strong>C4 Model</strong> (Contexto e Containers) e Diagramas de Fluxo para documentar e resolver problemas reais de arquitetura. Foco em ingestão assíncrona, desacoplamento e isolamento de domínios.</li>
+<li><strong>Desafio Arquitetural:</strong> Como traduzir requisitos de negócio em topologias técnicas viáveis. Balancear a flexibilidade de ingestão de dados com a resiliência do processamento, e definir limites claros entre o que é o &quot;Core&quot; do negócio e o que deve ser delegado a terceiros (Buy vs. Build).</li>
+</ul>
+<h2>2. Passo a Passo Cronológico</h2>
+<p><strong>[00:00 - 01:32] Introdução: A Prática do System Design</strong></p>
+<ul>
+<li><strong>Conceito:</strong> A teoria fornece as ferramentas, mas System Design só se consolida com a prática. O livro não ensina o &quot;C4 Model&quot; profundamente, mas recomenda-se que o primeiro passo para qualquer arquitetura seja <strong>compreender o problema de negócio</strong> e, em seguida, desenhar o contexto macro (Nível 1 do C4).</li>
+<li><strong>Decisão Arquitetural:</strong> Iniciar o design de soluções sempre pelo &quot;Caminho Feliz&quot; e pelo fluxo de negócio antes de escolher bancos de dados ou frameworks.</li>
+</ul>
+<p><strong>[01:33 - 10:16] Cenário 1: Multi-Channel Product Updates (E-commerce Broadcast)</strong></p>
+<ul>
+<li><strong>Contexto de Negócio:</strong> Um sistema que atua como ponte/agregador entre usuários e plataformas de e-commerce (ex: buscar o iPhone 16 mais barato entre concorrentes).</li>
+<li><strong>Visão de Contexto (C4 Nível 1):</strong> O sistema se posiciona entre os <em>Vendors</em> (Fornecedores de dados), <em>Internal Operators</em> (Operação de negócio) e <em>Marketplace Platforms</em> (Amazon, etc).</li>
+<li><strong>Interpretação do Diagrama de Containers (C4 Nível 2):</strong>
+<ul>
+<li><code>[Vendor/Client]</code> -&gt; <code>[Ingestion Service (REST/FTP/Email)]</code></li>
+<li><code>[Ingestion Service]</code> -&gt; Publica mensagem -&gt; <code>[Message Queue (RabbitMQ)]</code></li>
+<li><code>[Queue]</code> -&gt; Consumida por -&gt; <code>[Processing Service (c/ motor de regras Drools)]</code></li>
+<li><code>[Processing Service]</code> salva dados brutos no -&gt; <code>[Data Lake (Raw Data)]</code></li>
+<li><code>[Processing Service]</code> salva dados limpos no -&gt; <code>[Data Warehouse (Normalized DB)]</code></li>
+<li><code>[Warehouse]</code> alimenta o -&gt; <code>[Cache (Redis)]</code> (Para leitura rápida)</li>
+<li><code>[Processing Service]</code> aciona -&gt; <code>[Notifiers/Async Sync]</code> -&gt; Envia <code>[Webhooks]</code> para parceiros.</li>
+</ul>
+</li>
+<li><strong>Trade-offs e Decisões Arquiteturais no Cenário 1:</strong>
+<ul>
+<li><em>Trade-off de Ingestão (REST vs FTP/Email):</em> A arquitetura aceita formatos legados (FTP) porque, no mundo real, o tamanho e a maturidade tecnológica dos parceiros B2B variam. <strong>Vantagem:</strong> Maior adoção de parceiros. <strong>Desvantagem:</strong> Maior complexidade na camada de <em>Ingestion/ETL</em>.</li>
+<li><em>Trade-off de Persistência (Raw Data vs Normalized):</em> O professor destaca a persistência dupla. Salvar o <em>Raw Data</em> (Data Lake). <strong>Vantagem:</strong> Permite auditoria, reprocessamento em caso de falhas e consumo futuro por times de Data Science. <strong>Desvantagem:</strong> Custo extra de armazenamento.</li>
+<li><em>Tolerância a Falhas (Mensageria):</em> O uso do RabbitMQ entre a ingestão e o processamento é justificado para evitar gargalos. Se o banco de dados cair, o sistema continua ingerindo requisições (elas ficam na fila), evitando que o parceiro receba erros <code>500 Internal Server Error</code>.</li>
+</ul>
+</li>
+</ul>
+<p><strong>[10:17 - 12:37] Cenário 2: Reservation System (Clone de Uber/Booking)</strong></p>
+<ul>
+<li><strong>Contexto de Negócio:</strong> Sistema que exige alta disponibilidade, concorrência, pagamentos, geolocalização e notificações.</li>
+<li><strong>Interpretação do Diagrama de Contexto:</strong>
+<ul>
+<li><code>[Customer]</code> -&gt; <code>[Reservation System (Core)]</code></li>
+<li><code>[Reservation System]</code> se comunica com -&gt; <code>[Payment Platform (Stripe)]</code>, <code>[Notification Service]</code>, <code>[Map/Routing Service]</code>.</li>
+</ul>
+</li>
+<li><strong>Decisão Arquitetural / Justificativa (Domain-Driven Design):</strong> O professor enfatiza o isolamento do <em>Core Business</em>. Construa apenas o sistema de reservas (seu diferencial). Autenticação, Mapas e Pagamentos são &quot;Generic Subdomains&quot;.
+<ul>
+<li><em>Trade-off:</em> Assinar contratos com terceiros (Stripe, Google Maps). <strong>Vantagem:</strong> Tira a complexidade absurda (PCI Compliance, Roteamento) de dentro de casa. Reduz tempo de <em>Time to Market</em>. <strong>Desvantagem:</strong> Cria dependência de fornecedores externos e custos fixos por transação.</li>
+</ul>
+</li>
+</ul>
+<p><strong>[12:38 - 15:36] Cenário 3: Social Media (Rede Social Corporativa/Twitter Clone)</strong></p>
+<ul>
+<li><strong>Contexto de Negócio:</strong> Aplicação com altíssimo volume de leituras (Feeds) em relação a gravações (Posts).</li>
+<li><strong>Interpretação do Diagrama de Contexto:</strong>
+<ul>
+<li><code>[User]</code> -&gt; <code>[Social Platform]</code> -&gt; <code>[Media Storage (S3/Blob)]</code> &amp; <code>[Analytics Platform]</code>.</li>
+</ul>
+</li>
+<li><strong>Desafio Arquitetural:</strong> A &quot;Inundação de Informações&quot;. Como o sistema define o que o usuário deve ver primeiro no Feed?</li>
+<li><strong>Decisão Arquitetural:</strong> Introdução de camadas de Machine Learning (ML) ou algoritmos de ranqueamento fora do fluxo síncrono. O feed precisa ser pré-computado ou usar motores de busca indexados (o professor citou o uso do <em>Elasticsearch</em> no Google Cloud para essa finalidade) para garantir baixíssima latência na leitura.</li>
+</ul>
+<p><strong>[15:37 - Fim] Dicas Finais para Entrevistas</strong></p>
+<ul>
+<li>Em entrevistas, use lousas visuais, abstraia a complexidade desnecessária e sempre comece pelo contexto de negócio (C1) antes de descer para a infraestrutura (C2).</li>
+</ul>
+<h2>3. Principais Conceitos</h2>
+<ul>
+<li><strong>Message Queue (Fila de Mensageria - Ex: RabbitMQ / Kafka):</strong> Componente que implementa comunicação assíncrona. Atua como um <em>buffer</em> entre serviços que produzem dados em alta velocidade e serviços que consomem esses dados em uma velocidade menor, nivelando picos de carga (Load Leveling).</li>
+<li><strong>Drools (Rule Engine):</strong> Um Sistema de Gerenciamento de Regras de Negócio (BRMS). Usado para separar lógicas de decisão complexas e mutáveis (ex: regras de precificação, descontos) do código-fonte da aplicação, permitindo atualizações dinâmicas.</li>
+<li><strong>Data Lake (Raw Data Storage):</strong> Repositório focado em armazenar um vasto volume de dados em seu formato bruto (JSON, XML, logs) sem esquemas rígidos. Altamente escalável e barato (Ex: AWS S3).</li>
+<li><strong>Data Warehouse (Normalized Storage):</strong> Repositório relacional ou colunar focado em dados já limpos, processados e normalizados, otimizado para consultas rápidas e geração de relatórios de BI (Business Intelligence).</li>
+<li><strong>Webhook:</strong> Padrão arquitetural onde um sistema notifica outro de forma reativa através de uma chamada HTTP POST. É o padrão da indústria para integrações assíncronas B2B (ex: &quot;Aise-me quando o pagamento for aprovado&quot;).</li>
+</ul>
+<h2>4. Resumo para Fixação</h2>
+<h3>📊 Design de Casos Práticos Resumidos</h3>
+<ul>
+<li><strong>Sistema de E-commerce (Price Aggregator):</strong>
+<ul>
+<li><em>Foco:</em> Ingestão massiva e normalização.</li>
+<li><em>Solução:</em> Padrão <em>Pipes and Filters</em> (Ingestão -&gt; Fila -&gt; Motor de Regras -&gt; Data Lake/DB -&gt; Cache -&gt; Webhook).</li>
+</ul>
+</li>
+<li><strong>Sistema de Reservas (Uber/Airbnb):</strong>
+<ul>
+<li><em>Foco:</em> Transacionalidade, geolocalização e parcerias.</li>
+<li><em>Solução:</em> Integrações pesadas via API externas para comodities (Pagamentos/Mapas) e isolamento do motor de cálculo de reservas em infraestrutura proprietária de alta disponibilidade.</li>
+</ul>
+</li>
+<li><strong>Sistema de Rede Social (Feed):</strong>
+<ul>
+<li><em>Foco:</em> Baixa latência de leitura (<em>Read-Heavy</em>).</li>
+<li><em>Solução:</em> Bancos NoSQL/Motores de busca (Elasticsearch) para o Feed pré-computado, armazenamento de objetos em nuvem (S3) para mídias, e filas assíncronas para processamento de Machine Learning.</li>
+</ul>
+</li>
+</ul>
+<h3>🚨 Armadilhas Comuns (Anti-patterns)</h3>
+<ol>
+<li><strong>Construir o que se deve Comprar (Not Invented Here Syndrome):</strong> Tentar arquitetar do zero o processamento de cartões de crédito ou servidores de envio de e-mail ao invés de plugar APIs maduras (Stripe, SendGrid). Em System Design, saber o que <em>não</em> construir é tão importante quanto saber construir.</li>
+<li><strong>Ignorar a Tolerância a Falhas na Ingestão (Backpressure):</strong> Desenhar uma API de ingestão que grava direto no banco de dados de forma síncrona. Se houver um pico de tráfego (Black Friday), o banco cai, a API cai e os dados dos parceiros são perdidos. <em>Solução: Use sempre um Message Broker na borda de ingestão.</em></li>
+<li><strong>Mergulhar Fundo Demais no C4 Model (Code Level):</strong> Durante entrevistas ou reuniões executivas, tentar explicar a arquitetura desenhando Diagramas de Classe (C4 Nível 3 ou 4). Mantenha a discussão em Componentes Deployáveis (APIs, Bancos, Filas - C4 Nível 2).</li>
+</ol>
+<h3>💡 Princípios Fundamentais (Regras de Ouro)</h3>
+<ul>
+<li><strong>Guarde o Raw Data (Sempre):</strong> Em processamento de dados críticos, se o seu algoritmo de normalização falhar ou corromper dados devido a um <em>bug</em>, ter o payload cru original salvo permite que você realize o &quot;Replay&quot; das mensagens e corrija a base de dados histórica.</li>
+<li><strong>O Diagrama é um Mapa de Conversação:</strong> Um diagrama de System Design não é um artefato estático; ele serve para guiar a conversa sobre restrições. Pergunte ao entrevistador/stakeholder: <em>&quot;Qual é a latência esperada aqui?&quot;</em>, <em>&quot;Quantos eventos por segundo prevemos nesta fila?&quot;</em>.</li>
+</ul>
+
+      </body>
+  </html>

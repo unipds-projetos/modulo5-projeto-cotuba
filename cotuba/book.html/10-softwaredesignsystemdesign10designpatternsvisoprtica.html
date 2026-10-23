@@ -1,0 +1,202 @@
+<DOCTYPE html>
+  <html lang="pt-br">
+      <head>
+          <meta charset="UTF-8">
+          <title>Software Design & System Design: 10 - Design Patterns - Visão Prática</title>
+      </head>
+      <body>
+       <h1>Software Design &amp; System Design: 10 - Design Patterns - Visão Prática</h1>
+<h2>1. Dados sobre a Aula</h2>
+<ul>
+<li><strong>Título Alternativo:</strong> Padrões de Projeto Guiados por Frameworks: Singleton, Strategy, Observer e Decorator na Prática.</li>
+<li><strong>Tópico Central:</strong> Implementação moderna dos Design Patterns Clássicos (GoF) utilizando recursos de Inversão de Controle (IoC) e Injeção de Dependência (foco em especificações Jakarta EE / CDI, plenamente aplicáveis ao ecossistema Spring).</li>
+<li><strong>Problema de Design:</strong> Como eliminar lógicas procedurais (blocos <code>if/else</code> gigantescos), reduzir o acoplamento estrutural na notificação de múltiplos componentes e adicionar comportamentos adicionais a uma classe sem violar o encapsulamento ou abusar da herança.</li>
+</ul>
+<h2>2. Passo a Passo Cronológico</h2>
+<p><strong>[00:00 - 02:13] O Fim do Singleton Manual (IoC Containers)</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> No mundo real de aplicações corporativas, não implementamos o padrão Singleton gerindo construtores privados e instâncias estáticas manuais. Nós delegamos o ciclo de vida do objeto para o <em>Container</em> (Spring, CDI, Micronaut).</li>
+<li><strong>Implementação de Código Java:</strong></li>
+</ul>
+<pre><code class="language-java">import jakarta.enterprise.context.ApplicationScoped;
+
+// Ao utilizar @ApplicationScoped (ou @Singleton), o framework garante
+// que apenas UMA instância desta classe existirá em toda a aplicação.
+@ApplicationScoped
+public class Payment {
+    public String processPayment(String paymentDetails) {
+        return &quot;Payment processed for: &quot; + paymentDetails;
+    }
+}
+</code></pre>
+<ul>
+<li><strong>Explicação da Lógica de Design:</strong> Deixar o container gerenciar o ciclo de vida remove <em>boilerplate code</em>, facilita o uso de <em>mocks</em> em testes unitários e evita vazamento de memória e problemas clássicos de concorrência em Singletons manuais.</li>
+</ul>
+<p><strong>[02:14 - 13:43] Refatorando Complexidade Acidental: Padrão Strategy com Qualifiers</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> O professor apresenta um anti-pattern bizarro: um serviço de pagamento com múltiplos <code>if (paypal) ... else if (creditCard) ...</code>. Isso quebra o Princípio de Responsabilidade Única e o Princípio Aberto/Fechado. A solução é o Padrão <strong>Strategy</strong>, instanciado dinamicamente através de Anotações/Filtros.</li>
+<li><strong>Implementação de Código Java (A Refatoração):</strong></li>
+</ul>
+<p><em>Passo 1: Extrair o Contrato (Interface)</em></p>
+<pre><code class="language-java">public interface PaymentService {
+    String processPayment(String paymentDetails);
+}
+</code></pre>
+<p><em>Passo 2: Criar o Enum e a Anotação de Qualificação (O Filtro)</em></p>
+<pre><code class="language-java">public enum PaymentType {
+    PAYPAL, CREDIT_CARD
+}
+
+import jakarta.inject.Qualifier;
+import java.lang.annotation.*;
+
+// Esta anotação cria um metadado para o framework saber qual classe injetar
+@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.TYPE, ElementType.METHOD})
+public @interface PaymentFilter {
+    PaymentType type();
+}
+</code></pre>
+<p><em>Passo 3: As Implementações (Fechadas para modificação)</em></p>
+<pre><code class="language-java">@ApplicationScoped
+@PaymentFilter(type = PaymentType.PAYPAL)
+public class PaypalPaymentService implements PaymentService {
+    @Override
+    public String processPayment(String paymentDetails) {
+        return &quot;Paypal payment processed&quot;;
+    }
+}
+
+@ApplicationScoped
+@PaymentFilter(type = PaymentType.CREDIT_CARD)
+public class CreditCardPaymentService implements PaymentService {
+    @Override
+    public String processPayment(String paymentDetails) {
+        return &quot;Credit Card payment processed&quot;;
+    }
+}
+</code></pre>
+<p><em>Passo 4: A Injeção Dinâmica</em></p>
+<pre><code class="language-java">// O Container permite buscar dinamicamente a implementação baseada no Enum/Filtro, 
+// eliminando completamente os IFs da regra de negócio.
+PaymentService service = container.select(
+    PaymentService.class, 
+    PaymentFilter.Literal.of(PaymentType.CREDIT_CARD)
+).get();
+
+service.processPayment(&quot;Order #12345&quot;);
+</code></pre>
+<ul>
+<li><strong>Explicação da Lógica de Design:</strong> Transformamos uma lógica imperativa (ifs) em declarativa. Se amanhã a empresa aceitar <em>Pix</em>, basta criar <code>PixPaymentService</code>, anotar com <code>@PaymentFilter(type = PaymentType.PIX)</code> e o sistema funcionará sem quebrar o código antigo. Pura aplicação de <strong>Open/Closed Principle</strong>.</li>
+</ul>
+<p><strong>[13:44 - 19:28] Desacoplamento de Domínios: Padrão Observer (Event-Driven)</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> O professor exibe um <code>NewsService</code> que precisava enviar notícias para um <code>Newspaper</code>, <code>Magazine</code> e <code>SocialMedia</code>. Injetar essas três classes diretamente no serviço cria forte acoplamento (a classe base precisa ser alterada toda vez que um novo canal nasce). A solução é o padrão <strong>Observer</strong> implementado via barramento de eventos local.</li>
+<li><strong>Implementação de Código Java:</strong></li>
+</ul>
+<pre><code class="language-java">// 1. O Produtor do Evento (Desacoplado de quem o consome)
+@ApplicationScoped
+public class NewsService {
+    
+    // Injeta o disparador de eventos do framework
+    @Inject
+    private Event&lt;String&gt; newsEvent; 
+
+    public void publishNews(String news) {
+        // Dispara o evento e não se importa quem vai ler
+        newsEvent.fire(news); 
+    }
+}
+
+// 2. Os Observadores (Listeners)
+@ApplicationScoped
+public class Newspaper {
+    // A anotação @Observes avisa o framework para invocar este método 
+    // sempre que um Event&lt;String&gt; for disparado.
+    public void printNews(@Observes String news) {
+        System.out.println(&quot;Printing Newspaper: &quot; + news);
+    }
+}
+
+@ApplicationScoped
+public class SocialMedia {
+    public void postToSocialMedia(@Observes String news) {
+        System.out.println(&quot;Social Media: &quot; + news);
+    }
+}
+</code></pre>
+<ul>
+<li><strong>Explicação da Lógica de Design:</strong> Este padrão inverte a dependência e viabiliza a escalabilidade de times. O time do <code>NewsService</code> apenas publica a novidade. O time responsável por Redes Sociais apenas escuta. Um não quebra o build do outro.</li>
+</ul>
+<p><strong>[19:29 - Fim] Adicionando Comportamento Dinâmico: Padrão Decorator</strong></p>
+<ul>
+<li><strong>Conceito de Design:</strong> E se eu quiser adicionar um comportamento (ex: mandar um e-mail para o chefe avisando que uma tarefa começou) ANTES de executar a regra de negócio central, mas sem alterar a classe original e sem criar herança bizarra? Usamos o <strong>Decorator</strong>.</li>
+<li><strong>Implementação de Código Java:</strong></li>
+</ul>
+<pre><code class="language-java">// 1. O Contrato
+public interface Worker {
+    String task(String taskName);
+}
+
+// 2. A implementação original (O Core do negócio)
+@ApplicationScoped
+public class Programmer implements Worker {
+    @Override
+    public String task(String taskName) {
+        return &quot;Coffee, code, repeat: &quot; + taskName;
+    }
+}
+
+// 3. O Decorator (Adiciona comportamento ao Programmer)
+import jakarta.decorator.Decorator;
+import jakarta.decorator.Delegate;
+
+@Decorator
+public class Manager implements Worker {
+
+    @Inject
+    @Delegate // O CDI sabe que deve envelopar a chamada real aqui
+    private Worker worker;
+
+    @Override
+    public String task(String taskName) {
+        // Comportamento adicionado ANTES
+        System.out.println(&quot;Sending an email to the boss about: &quot; + taskName);
+        
+        // Delega para o Programmer fazer o trabalho real
+        String result = worker.task(taskName); 
+        
+        // Comportamento adicionado DEPOIS
+        System.out.println(&quot;And now I will take a coffee break.&quot;);
+        
+        return result;
+    }
+}
+</code></pre>
+<ul>
+<li><strong>Explicação da Lógica de Design:</strong> O Decorator atua como um &quot;wrapper&quot; (um envelope). O framework intercepta a chamada destinada ao <code>Programmer</code>, passa pelo <code>Manager</code> primeiro, e então o <code>Manager</code> delega para a classe original. Isso respeita o princípio <strong>Favor Composition Over Inheritance</strong>.</li>
+</ul>
+<h2>3. Principais Conceitos</h2>
+<ul>
+<li><strong>Strategy Pattern:</strong> Padrão comportamental que define uma família de algoritmos, encapsula cada um deles e os torna intercambiáveis. Executado na aula removendo <code>if/else</code> usando injeção de dependência qualificada.</li>
+<li><strong>Observer Pattern / Event-Driven:</strong> Padrão onde um objeto (Subject/Publisher) mantém uma lista de dependentes (Observers) e notifica-os automaticamente de qualquer mudança de estado, garantindo baixo acoplamento entre módulos.</li>
+<li><strong>Decorator Pattern:</strong> Padrão estrutural que permite anexar comportamentos adicionais a um objeto dinamicamente (em tempo de execução via <em>Proxies</em> do framework), oferecendo uma alternativa flexível à herança para estender funcionalidades.</li>
+<li><strong>Qualifier (Filtro):</strong> Metadado (Anotação customizada) em frameworks IoC que permite ao desenvolvedor especificar <em>qual</em> implementação de uma interface ele deseja injetar, resolvendo ambiguidades quando existem múltiplas implementações para o mesmo contrato.</li>
+</ul>
+<h2>4. Resumo para Fixação</h2>
+<h3>🚨 Armadilhas Comuns (Pitfalls)</h3>
+<ol>
+<li><strong>Lógica Procedural Presa em Regras de Negócio (God Class):</strong> Manter métodos inchados com múltiplos <code>if (tipo == A) ... else if (tipo == B)</code>. Toda vez que um novo tipo nasce, você precisa modificar a classe principal, arriscando quebrar o que já funcionava. <strong>Solução: Extraia para um padrão Strategy.</strong></li>
+<li><strong>Acoplamento Forte em Notificações:</strong> Uma classe que precisa executar um processo e depois notificar 5 outros subsistemas sobre isso, tendo os 5 serviços injetados em seu construtor. Isso gera classes difíceis de testar e fáceis de quebrar. <strong>Solução: Eventos e padrão Observer.</strong></li>
+<li><strong>Abuso de Herança para adicionar pequenos comportamentos:</strong> Criar <code>ProgrammerComNotificacaoDeChefe extends Programmer</code> fere a semântica da OO. Herança é &quot;É um&quot;. O programador não &quot;É UM&quot; notificador. <strong>Solução: Componha via Decorator.</strong></li>
+</ol>
+<h3>🛡️ Princípios de Orientação a Objetos</h3>
+<ul>
+<li><strong>Open/Closed Principle (OCP - SOLID):</strong> Os três padrões mostrados (Strategy, Observer, Decorator) baseiam-se em deixar o código <em>Fechado para Modificação</em> (as classes antigas não são mais editadas) e <em>Aberto para Extensão</em> (basta criar uma nova classe <code>Strategy</code>, um novo método com <code>@Observes</code>, ou um novo <code>@Decorator</code>).</li>
+<li><strong>Single Responsibility Principle (SRP - SOLID):</strong> Ao fatiar o gigantesco <code>PaymentService</code> nas implementações específicas (<code>PaypalPaymentService</code>, <code>CreditCardPaymentService</code>), cada classe passou a ter um único motivo para mudar.</li>
+<li><strong>Inversion of Control (IoC):</strong> A prática de não dar <code>new</code> manualmente nos objetos, permitindo que a arquitetura escale sob o gerenciamento de metadados do container da aplicação.</li>
+</ul>
+
+      </body>
+  </html>

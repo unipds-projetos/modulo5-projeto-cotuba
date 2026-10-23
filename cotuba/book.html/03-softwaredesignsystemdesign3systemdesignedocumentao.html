@@ -1,0 +1,128 @@
+<DOCTYPE html>
+  <html lang="pt-br">
+      <head>
+          <meta charset="UTF-8">
+          <title>Software Design & System Design: 3 - System Design e Documentação</title>
+      </head>
+      <body>
+       <h1>Software Design &amp; System Design: 3 - System Design e Documentação</h1>
+<h2>1. Dados sobre a Aula</h2>
+<ul>
+<li><strong>Título Alternativo:</strong> A Engenharia da Documentação: C4 Model, ADRs e a Cultura de <em>Documentation as Code</em>.</li>
+<li><strong>Tópico Central:</strong> Como escalar o conhecimento técnico de sistemas distribuídos utilizando artefatos de documentação rastreáveis e versionáveis (C4 Model, UML, ADR, Markdown, AsciiDoc, Mermaid e Structurizr).</li>
+<li><strong>Desafio Arquitetural:</strong> Resolver a &quot;escalabilidade humana&quot; e a continuidade de negócio. Como garantir que dezenas de engenheiros em fuso horários diferentes compreendam as fronteiras do sistema, o fluxo de dados e o <em>porquê</em> das decisões técnicas passadas, sem depender de reuniões síncronas ou ferramentas manuais não versionadas.</li>
+</ul>
+<h2>2. Passo a Passo Cronológico</h2>
+<p><strong>[00:00 - 03:55] O Propósito da Documentação em System Design</strong></p>
+<ul>
+<li><strong>Conceito:</strong> A documentação não é um fim em si mesma, mas uma ferramenta de alinhamento e escalabilidade. Em arquiteturas distribuídas, a documentação mitiga a necessidade de comunicação síncrona (reuniões).</li>
+<li><strong>Motivadores (Bullet Points do Slide):</strong>
+<ul>
+<li>Planejamento e Alinhamento.</li>
+<li>Escalabilidade (Foco humano, não técnico: <em>Onboarding/Offboarding</em> rápidos).</li>
+<li>Rastreabilidade de decisões (<em>Traceability</em>).</li>
+<li>Refatoração e Modernização.</li>
+<li>Continuidade de Negócio (Reduzir o fator &quot;Lotação de Ônibus&quot; / <em>Bus Factor</em>).</li>
+</ul>
+</li>
+</ul>
+<p><strong>[03:55 - 07:43] Tipos de Documentação: UML (Unified Modeling Language)</strong></p>
+<ul>
+<li><strong>Conceito:</strong> A linguagem clássica, porém deve ser usada com pragmatismo em System Design.</li>
+<li><strong>Diagramas Úteis para Arquitetura:</strong>
+<ul>
+<li><em>Component Diagram:</em> Mostra módulos e dependências.</li>
+<li><em>Sequence Diagram:</em> <strong>Altamente utilizado.</strong> Define integrações, <em>caminho feliz</em> e chamadas assíncronas ao longo do tempo.</li>
+<li><em>Activity / Flow Diagram:</em> Mostra o fluxo de dados e condicionais.</li>
+</ul>
+</li>
+<li><strong>Trade-off Arquitetural (Class Diagrams):</strong> O professor desaconselha o uso de Diagramas de Classe para System Design. Eles são detalhados demais e entram no escopo tático (Software Design). A exceção são cenários de <em>Outsourcing</em> (fábricas de software), onde a especificação precisa ser rígida para times que apenas codificam sem entender o negócio.</li>
+</ul>
+<p><strong>[07:43 - 10:07] Tipos de Documentação: O Modelo C4 (C4 Model)</strong></p>
+<ul>
+<li><strong>Conceito Crítico:</strong> O professor usa a analogia do <strong>Google Maps</strong>. O C4 Model permite dar <em>Zoom In</em> e <em>Zoom Out</em> na arquitetura, variando do nível de negócios até o nível de código.</li>
+<li><strong>Níveis de Abstração:</strong>
+<ol>
+<li><strong>Context (Nível 1):</strong> O sistema em relação ao mundo externo (usuários, sistemas de terceiros). Visão macro para executivos.</li>
+<li><strong>Container (Nível 2):</strong> As unidades &quot;deployáveis&quot; (APIs, Bancos de Dados, Filas Kafka, SPAs). Visão para Arquitetos.</li>
+<li><strong>Component (Nível 3):</strong> Divisão lógica interna de um container (ex: Controladores, Serviços, Repositórios).</li>
+<li><strong>Code (Nível 4 - Opcional):</strong> Raramente utilizado. A recomendação do criador (Simon Brown) e do professor é: <strong>deixe o código falar por si mesmo</strong>.</li>
+</ol>
+</li>
+<li><strong>Decisão Arquitetural:</strong> Em System Design, o foco absoluto deve estar nos Níveis 1 (Context) e 2 (Container).</li>
+</ul>
+<p><strong>[10:07 - 11:10] ADR - Architecture Decision Record</strong></p>
+<ul>
+<li><strong>Conceito:</strong> Artefato de texto curto que documenta <em>decisões de design de software que importam</em>.</li>
+<li><strong>Responsabilidade:</strong> Documentar o <strong>Porquê</strong>. O código diz o <em>como</em>, a ADR diz o porquê (contexto, trade-offs analisados, prós e contras da decisão aceita).</li>
+<li><strong>Evolução Sistêmica:</strong> Permite que o time rastreie quando uma decisão se tornou obsoleta (ex: Migração de Monolito para Microsserviços, ou troca de Java 21 por Java 25).</li>
+</ul>
+<p><strong>[11:10 - 14:18] A Regra de Ouro: Documentation as Code (Docs-as-Code)</strong></p>
+<ul>
+<li><strong>Conceito Crítico:</strong> Tratar a documentação com o mesmo rigor, ciclo de vida e ferramentas usadas no código-fonte.</li>
+<li><strong>Trade-off (Ferramentas Visuais vs. Docs-as-Code):</strong>
+<ul>
+<li><em>Draw.io / Miro / Visio:</em> <strong>Desvantagem:</strong> São difíceis de versionar no Git, não permitem Code Review/Pull Requests e ficam rapidamente defasados em relação à implementação real.</li>
+<li><em>Docs-as-Code:</em> <strong>Vantagem:</strong> Arquivos de texto renderizados. Permitem controle de versão (Git), revisões via Pull Request (integração natural ao fluxo do dev) e integração com CI/CD.</li>
+</ul>
+</li>
+</ul>
+<p><strong>[14:18 - 20:05] Markdown vs. AsciiDoc (A Escolha da Linguagem)</strong></p>
+<ul>
+<li><strong>Markdown:</strong>
+<ul>
+<li><em>Pros:</em> Curva de aprendizado quase nula, suportado nativamente pelo GitHub/GitLab. Excelente para <em>Readmes</em> e ADRs.</li>
+<li><em>Cons:</em> Falta semântica rica para documentos complexos. Necessita de plugins para diagramação.</li>
+</ul>
+</li>
+<li><strong>AsciiDoc:</strong>
+<ul>
+<li><em>Pros:</em> Extensível, modular e semântico. Permite a quebra de documentação em múltiplos arquivos (includes). Suporta diagramas nativamente. <strong>Decisão Arquitetural:</strong> É a escolha padrão para especificações longas e complexas (ex: Especificações do Jakarta EE).</li>
+<li><em>Cons:</em> Curva de aprendizado moderada; requer conversores pesados (ex: gerar PDF).</li>
+</ul>
+</li>
+</ul>
+<p><strong>[24:24 - 34:28] Visualizando Arquitetura com Diagramação em Texto</strong></p>
+<ul>
+<li><strong>PlantUML:</strong> Usa sintaxe própria. Excelente para estruturar classes e componentes rapidamente via texto.</li>
+<li><strong>Mermaid.js (Altamente Recomendado):</strong>
+<ul>
+<li><em>Justificativa:</em> Suporte nativo nas principais plataformas Git (GitHub, GitLab).</li>
+<li><em>Interpretação de Diagrama (Sequence - Representação de Requisão Java):</em> O professor exibe a construção em texto de um fluxo clássico N-Tier:
+<code>[Cliente] -&gt; [API Gateway/Controller] -&gt; [Service/Lógica de Negócio] -&gt; [Cache Redis] (Opcional) -&gt; [Repository/DAO] -&gt; [Banco de Dados]</code>.
+O fluxo reverso representa o retorno da resposta (<em>Response</em>).</li>
+<li><em>Interpretação de Diagrama (State - Ciclo do Cartão de Crédito):</em> Um fluxo de estado onde o cartão vai de <code>Criado</code> -&gt; <code>Ativo</code> -&gt; <code>Suspenso</code> ou <code>Cancelado</code>.</li>
+</ul>
+</li>
+</ul>
+<p><strong>[34:28 - Fim] Structurizr e a Implementação do C4 Model</strong></p>
+<ul>
+<li><strong>Conceito:</strong> Uma ferramenta baseada em uma DSL (Domain Specific Language) escrita especificamente para instanciar o C4 Model como código.</li>
+<li><em>Interpretação de Diagrama (Contexto Bancário - C4 Nível 1):</em>
+<code>Customer (Usuário) -&gt; Bank System (Sistema Interno) -&gt; Payment Processor (Gateway de Pagamento Externo como Stripe)</code>.</li>
+<li><em>Vantagem:</em> A partir de um modelo único de código, o Structurizr gera as visões de Contexto, Container e Componente dinamicamente, mantendo tudo sincronizado.</li>
+</ul>
+<h2>3. Principais Conceitos</h2>
+<ul>
+<li><strong>Documentation as Code (GitOps para Docs):</strong> Filosofia onde a documentação é escrita em arquivos de marcação de texto plano (Markdown, AsciiDoc) e armazenada no repositório Git junto com o código-fonte, acompanhando o mesmo ciclo de CI/CD e Pull Requests.</li>
+<li><strong>C4 Model:</strong> Padrão arquitetural criado por Simon Brown para modelar a topologia de sistemas através de 4 níveis hierárquicos de abstração (Context, Container, Component, Code).</li>
+<li><strong>ADR (Architecture Decision Record):</strong> Log imutável que registra uma escolha arquitetural em um momento específico do tempo, documentando o contexto, as restrições da época e as consequências (prós e contras) da escolha.</li>
+<li><strong>AsciiDoc:</strong> Linguagem de marcação de texto avançada, superior ao Markdown para a geração de livros técnicos, especificações e documentações complexas, permitindo <em>includes</em> e macros nativas.</li>
+<li><strong>Mermaid / PlantUML:</strong> Ferramentas/Linguagens que convertem scripts de texto em diagramas UML ou gráficos de fluxo em tempo de renderização.</li>
+</ul>
+<h2>4. Resumo para Fixação</h2>
+<h3>🚨 Armadilhas Comuns (Anti-patterns)</h3>
+<ol>
+<li><strong>&quot;Draw.io Architecture&quot;:</strong> Desenhar diagramas arquiteturais em plataformas visuais fora do controle de versão (Git). Isso gera o anti-pattern <em>Outdated Documentation</em>, onde o diagrama não reflete a topologia atual em produção.</li>
+<li><strong>Excesso de Detalhamento (O Anti-Pattern do Microgerenciamento):</strong> Tentar documentar lógicas de classes e métodos minuciosos em diagramas arquiteturais. <em>Regra de ouro:</em> Se o nível 4 do C4 Model (Código) está sendo exigido, o código possui &quot;Bad Smells&quot; e está ilegível. O código deve ser a verdade final.</li>
+<li><strong>Monólitos de Documentação:</strong> Ter repositórios com documentação separada do repositório da aplicação. Quando o desenvolvedor altera um serviço de pagamento (ex: adicionando integração com Stripe), a documentação no repositório isolado é esquecida. A documentação deve viver <em>ao lado</em> da base de código que a origina.</li>
+</ol>
+<h3>💡 Princípios Fundamentais (Regras de Ouro)</h3>
+<ul>
+<li><strong>Single Source of Truth:</strong> O Git é a única fonte de verdade para a aplicação e para o design da arquitetura. Se não está no repositório, não existe.</li>
+<li><strong>A Documentação deve ter o perfil de um mapa (C4 Model):</strong> Diferentes <em>stakeholders</em> exigem níveis de detalhe diferentes. Um CTO não quer ver a ordem de execução do Banco de Dados; ele quer ver o C4 Model Nível 1 (Sistema Bancário se conectando à API do Bacen).</li>
+<li><strong>Documente Trade-offs com ADRs:</strong> Toda arquitetura evolui. O que é um &quot;padrão defasado&quot; hoje (como usar um banco relacional gigantesco) foi uma decisão correta há 5 anos atrás. A ADR protege o time atual de cometer os mesmos erros do passado sem entender o contexto.</li>
+</ul>
+
+      </body>
+  </html>

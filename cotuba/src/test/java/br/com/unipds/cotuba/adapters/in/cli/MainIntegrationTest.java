@@ -1,4 +1,4 @@
-package br.com.unipds;
+package br.com.unipds.cotuba.adapters.in.cli;
 
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfReader;
@@ -37,6 +37,13 @@ class MainIntegrationTest {
         // Cria o arquivo de teste
         arquivoMd = diretorioDosMd.resolve("01-introducao.md");
         Files.writeString(arquivoMd, "# Capítulo Teste\n\nEste é um conteúdo de um arquivo Markdown.");
+
+        Path arquivoProperties = diretorioDosMd.resolve("ebook.properties");
+        Files.writeString(arquivoProperties, """
+                cotuba.ebook.titulo=Apostila de Design
+                cotuba.ebook.autor=UNIPDS
+                """);
+
     }
 
     @AfterEach
@@ -104,7 +111,7 @@ class MainIntegrationTest {
         });
 
         assertThat(exitCode).isEqualTo(1);
-        assertThat(errContent.toString()).contains("Formato do ebook inválido: mobi");
+        assertThat(errContent.toString()).contains("Formato do ebook inválido: MOBI");
         assertThat(arquivoSaida).doesNotExist();
     }
 
