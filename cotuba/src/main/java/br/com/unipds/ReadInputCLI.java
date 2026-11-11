@@ -1,4 +1,4 @@
-package br.com.unipds.cli;
+package br.com.unipds;
 
 import org.apache.commons.cli.*;
 
@@ -16,7 +16,7 @@ public class ReadInputCLI {
     private Path outputFile;
     private boolean verbose;
 
-    public void read(String[] args) {
+    public OptionsCLI read(String[] args) {
         var options = new Options();
 
         try {
@@ -78,6 +78,8 @@ public class ReadInputCLI {
 
             verbose = cmd.hasOption("verbose");
 
+            return new OptionsCLI(directoryMD, outputFile, fileFormat, verbose);
+
         } catch (ParseException e) {
             System.err.println(e.getMessage());
 
@@ -86,22 +88,6 @@ public class ReadInputCLI {
 
             throw new IllegalStateException();
         }
-    }
-
-    public Path getDirectoryMD() {
-        return directoryMD;
-    }
-
-    public String getFileFormat() {
-        return fileFormat;
-    }
-
-    public Path getOutputFile() throws IOException {
-        return outputFile;
-    }
-
-    public boolean isVerbose() {
-        return verbose;
     }
 
 }

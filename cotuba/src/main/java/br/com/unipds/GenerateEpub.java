@@ -1,4 +1,4 @@
-package br.com.unipds.services;
+package br.com.unipds;
 
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;

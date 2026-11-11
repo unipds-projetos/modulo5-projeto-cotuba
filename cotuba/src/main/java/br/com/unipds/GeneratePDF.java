@@ -1,4 +1,4 @@
-package br.com.unipds.services;
+package br.com.unipds;
 
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.pdf.PdfDocument;
