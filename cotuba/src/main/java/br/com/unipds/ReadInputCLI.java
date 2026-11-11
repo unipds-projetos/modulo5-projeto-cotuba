@@ -1,5 +1,6 @@
 package br.com.unipds;
 
+import br.com.unipds.ebook.EbookFormat;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -8,12 +9,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.Locale;
 
 public class ReadInputCLI {
 
     private Path directoryMD;
-    private String fileFormat;
     private Path outputFile;
+    private EbookFormat fileFormat;
     private boolean verbose;
 
     public OptionsCLI read(String[] args) {
@@ -52,10 +54,14 @@ public class ReadInputCLI {
 
             String fileFormatEbook = cmd.getOptionValue("format");
 
-            if (fileFormatEbook != null) {
-                fileFormat = fileFormatEbook.toLowerCase();
-            } else {
-                fileFormat = "pdf";
+            try {
+                if (fileFormatEbook != null) {
+                    fileFormat = EbookFormat.valueOf(fileFormatEbook);
+                } else {
+                    fileFormat = EbookFormat.PDF;
+                }
+            } catch (IllegalArgumentException ex) {
+                throw new IllegalArgumentException("Formato do Ebook inválido: ." + fileFormatEbook.toLowerCase());
             }
 
             try {
@@ -63,7 +69,7 @@ public class ReadInputCLI {
                 if (nameOutputFile != null) {
                     outputFile = Paths.get(nameOutputFile);
                 } else {
-                    outputFile = Paths.get("book." + fileFormat.toLowerCase());
+                    outputFile = Paths.get("book." + fileFormat.name().toLowerCase());
                 }
                 if (Files.isDirectory(outputFile)) {
                     // deleta arquivos do diretório recursivamente

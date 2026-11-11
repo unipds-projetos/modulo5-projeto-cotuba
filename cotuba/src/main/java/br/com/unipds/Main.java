@@ -1,5 +1,7 @@
 package br.com.unipds;
 
+import br.com.unipds.ebook.EbookFormat;
+
 import java.util.List;
 
 public class Main {
@@ -23,11 +25,11 @@ public class Main {
             RenderMarkdown renderMarkdown = new RenderMarkdown();
             List<String> htmls = renderMarkdown.render(optionsCLI.directoryMd());
 
-            if ("pdf".equals(optionsCLI.fileFormat())) {
+            if (EbookFormat.PDF.equals(optionsCLI.fileFormat())) {
                 GeneratePDF pdf = new GeneratePDF();
                 pdf.generate(htmls, optionsCLI.outputFile());
 
-            } else if ("epub".equals(optionsCLI.fileFormat())) {
+            } else if (EbookFormat.EPUB.equals(optionsCLI.fileFormat())) {
                 GenerateEpub epub = new GenerateEpub();
                 epub.generate(htmls, optionsCLI.outputFile());
 
