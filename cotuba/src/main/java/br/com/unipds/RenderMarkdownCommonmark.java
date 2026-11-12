@@ -18,7 +18,8 @@ public class RenderMarkdownCommonmark implements RenderMarkdown {
 
     @Override
     public void render(List<Chapter> chapters) {
-        chapters.stream().map(chapter -> {
+
+        chapters.forEach(chapter -> {
             Parser parser = Parser.builder().build();
             Node document = null;
 
@@ -50,12 +51,9 @@ public class RenderMarkdownCommonmark implements RenderMarkdown {
                 String html = renderer.render(document);
 
                 chapter.setHtml(html);
-                return chapter;
-
             } catch (Exception ex) {
                 throw new IllegalStateException("Erro ao renderizar para HTML o arquivo " + fileMd, ex);
             }
-
-        }).toList();
+        });
     }
 }
