@@ -19,7 +19,10 @@ public class Main {
 
             verbose = optionsCLI.verbose();
 
-            CotubaService cotubaService = new CotubaService();
+            CotubaService cotubaService = new CotubaService(
+                    new RenderMarkdownCommonmark(),
+                    new ReaderPropertiesEbookFile()
+            );
             cotubaService.executar(optionsCLI);
 
             System.out.println("Arquivo gerado com sucesso: " + optionsCLI.outputFile());

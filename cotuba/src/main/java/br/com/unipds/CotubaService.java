@@ -8,14 +8,20 @@ import java.util.List;
 
 public class CotubaService {
 
+    private RenderMarkdown renderMarkdown;
+    private ReaderPropertiesEbook readerPropertiesEbook;
+
+    public CotubaService(RenderMarkdown renderMarkdown, ReaderPropertiesEbook readerPropertiesEbook) {
+        this.renderMarkdown = renderMarkdown;
+        this.readerPropertiesEbook = readerPropertiesEbook;
+    }
+
     public void executar(OptionsCLIDTO optionsCLI) {
-        RenderMarkdown renderMarkdownCommonmark = new RenderMarkdownCommonmark();
-        List<Chapter> chapters = renderMarkdownCommonmark.render(optionsCLI.directoryMd());
+        List<Chapter> chapters = renderMarkdown.render(optionsCLI.directoryMd());
 
         Ebook ebook = new Ebook();
 
-        ReaderPropertiesEbook readerPropertiesEbookFile = new ReaderPropertiesEbookFile();
-        readerPropertiesEbookFile.read(optionsCLI.directoryMd(), ebook);
+        readerPropertiesEbook.read(optionsCLI.directoryMd(), ebook);
 
         ebook.setChapters(chapters);
         ebook.setOutputFile(optionsCLI.outputFile());
