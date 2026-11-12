@@ -1,6 +1,7 @@
 package br.com.unipds;
 
 import br.com.unipds.ebook.Ebook;
+import br.com.unipds.ebook.EbookFormat;
 import br.com.unipds.ebook.chapter.Chapter;
 import jakarta.enterprise.context.ApplicationScoped;
 import nl.siegmann.epublib.domain.Author;
@@ -17,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+@EbookFormatQualifier(EbookFormat.EPUB)
 @ApplicationScoped
 public class GeneratorEpub implements GeneratorEbook {
 
