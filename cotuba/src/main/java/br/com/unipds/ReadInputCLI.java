@@ -1,6 +1,7 @@
 package br.com.unipds;
 
 import br.com.unipds.ebook.EbookFormat;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -11,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Locale;
 
+@ApplicationScoped
 public class ReadInputCLI {
 
     public OptionsCLIDTO read(String[] args) {

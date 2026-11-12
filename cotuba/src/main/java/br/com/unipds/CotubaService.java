@@ -3,32 +3,48 @@ package br.com.unipds;
 import br.com.unipds.ebook.Ebook;
 import br.com.unipds.ebook.EbookFormat;
 import br.com.unipds.ebook.chapter.Chapter;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.util.List;
 
+@ApplicationScoped
 public class CotubaService {
 
+    private final RenderMarkdown renderMarkdown;
+    private final ReaderPropertiesEbook readerPropertiesEbook;
+    private final MarkdownRepository markdownRepository;
+
+    @Inject
+    public CotubaService(RenderMarkdown renderMarkdown, ReaderPropertiesEbook readerPropertiesEbook, MarkdownRepositoryDirectory markdownRepository) {
+        this.renderMarkdown = renderMarkdown;
+        this.readerPropertiesEbook = readerPropertiesEbook;
+        this.markdownRepository = markdownRepository;
+    }
+
     public void executar(OptionsCLIDTO optionsCLI) {
-        RenderMarkdown renderMarkdown = new RenderMarkdown();
-        List<Chapter> chapters = renderMarkdown.render(optionsCLI.directoryMd());
+        List<Chapter> chapters = markdownRepository.get(optionsCLI.directoryMd());
+        renderMarkdown.render(chapters);
 
         Ebook ebook = new Ebook();
-
-        LeitorPropriedadesEbook leitorPropriedadesEbook = new LeitorPropriedadesEbook();
-        leitorPropriedadesEbook.ler(optionsCLI.directoryMd(), ebook);
+        readerPropertiesEbook.read(optionsCLI.directoryMd(), ebook);
 
         ebook.setChapters(chapters);
         ebook.setOutputFile(optionsCLI.outputFile());
         ebook.setFormat(optionsCLI.fileFormat());
 
+        GeneratorEbook generatorEbook = null;
+
         if (EbookFormat.PDF.equals(ebook.getFormat())) {
-            GeneratePDF pdf = new GeneratePDF();
-            pdf.generate(ebook);
+            generatorEbook = new GeneratorPdf();
 
         } else if (EbookFormat.EPUB.equals(ebook.getFormat())) {
-            GenerateEpub epub = new GenerateEpub();
-            epub.generate(ebook);
+            generatorEbook = new GeneratorEpub();
+        } else {
+            throw new IllegalArgumentException("Formato do Ebook inválido: " + optionsCLI.fileFormat());
         }
+
+        generatorEbook.generate(ebook);
 
     }
 

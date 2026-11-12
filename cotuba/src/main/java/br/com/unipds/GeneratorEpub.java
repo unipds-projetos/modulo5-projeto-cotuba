@@ -2,9 +2,9 @@ package br.com.unipds;
 
 import br.com.unipds.ebook.Ebook;
 import br.com.unipds.ebook.chapter.Chapter;
+import jakarta.enterprise.context.ApplicationScoped;
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
-import nl.siegmann.epublib.domain.GuideReference;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.epub.EpubWriter;
 import nl.siegmann.epublib.service.MediatypeService;
@@ -17,8 +17,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-public class GenerateEpub {
+@ApplicationScoped
+public class GeneratorEpub implements GeneratorEbook {
 
+    @Override
     public void generate(Ebook ebook) {
         List<Chapter> chapters = ebook.getChapters();
         Path outputFile = ebook.getOutputFile();

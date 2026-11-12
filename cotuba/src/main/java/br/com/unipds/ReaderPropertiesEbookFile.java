@@ -1,16 +1,20 @@
 package br.com.unipds;
 
 import br.com.unipds.ebook.Ebook;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
-public class LeitorPropriedadesEbook {
+@ApplicationScoped
+public class ReaderPropertiesEbookFile implements ReaderPropertiesEbook {
 
-    public void ler(Path directoryMd, Ebook ebook) {
+    @Override
+    public void read(Path directoryMd, Ebook ebook) {
 
         Path fileProperties = directoryMd.resolve("ebook.properties");
 
@@ -20,8 +24,8 @@ public class LeitorPropriedadesEbook {
 
         Properties properties = new Properties();
 
-        try (InputStream input = Files.newInputStream(fileProperties)) {
-            properties.load(input);
+        try (Reader reader = Files.newBufferedReader(fileProperties, StandardCharsets.UTF_8)) {
+            properties.load(reader);
         } catch (IOException e) {
             throw new IllegalStateException("Erro ao ler arquivo " + fileProperties);
         }
