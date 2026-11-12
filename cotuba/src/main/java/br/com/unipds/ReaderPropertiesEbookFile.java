@@ -9,9 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
-public class LeitorPropriedadesEbook {
+public class ReaderPropertiesEbookFile implements ReaderPropertiesEbook {
 
-    public void ler(Path directoryMd, Ebook ebook) {
+    @Override
+    public void read(Path directoryMd, Ebook ebook) {
 
         Path fileProperties = directoryMd.resolve("ebook.properties");
 

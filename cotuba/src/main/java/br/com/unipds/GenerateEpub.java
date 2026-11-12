@@ -17,8 +17,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-public class GenerateEpub {
+public class GenerateEpub implements Generator {
 
+    @Override
     public void generate(Ebook ebook) {
         List<Chapter> chapters = ebook.getChapters();
         Path outputFile = ebook.getOutputFile();

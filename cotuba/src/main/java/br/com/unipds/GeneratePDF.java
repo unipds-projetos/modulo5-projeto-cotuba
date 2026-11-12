@@ -17,8 +17,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-public class GeneratePDF {
+public class GeneratePDF implements Generator {
 
+    @Override
     public void generate(Ebook ebook) {
         Path outputFile = ebook.getOutputFile();
 
