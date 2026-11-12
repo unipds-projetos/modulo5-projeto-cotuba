@@ -16,7 +16,7 @@ public class CotubaService {
     private final MarkdownRepository markdownRepository;
 
     @Inject
-    public CotubaService(RenderMarkdown renderMarkdown, ReaderPropertiesEbook readerPropertiesEbook, MarkdownRepository markdownRepository) {
+    public CotubaService(RenderMarkdown renderMarkdown, ReaderPropertiesEbook readerPropertiesEbook, MarkdownRepositoryDirectory markdownRepository) {
         this.renderMarkdown = renderMarkdown;
         this.readerPropertiesEbook = readerPropertiesEbook;
         this.markdownRepository = markdownRepository;
