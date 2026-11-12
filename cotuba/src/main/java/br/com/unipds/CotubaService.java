@@ -8,13 +8,14 @@ import java.util.List;
 
 public class CotubaService {
 
-    public void executar(OptionsCLI optionsCLI) {
+    public void executar(OptionsCLIDTO optionsCLI) {
         RenderMarkdown renderMarkdown = new RenderMarkdown();
         List<Chapter> chapters = renderMarkdown.render(optionsCLI.directoryMd());
 
         Ebook ebook = new Ebook();
-        ebook.setTitle("Teste");
-        ebook.setAuthor("Teste Autor");
+
+        LeitorPropriedadesEbook leitorPropriedadesEbook = new LeitorPropriedadesEbook();
+        leitorPropriedadesEbook.ler(optionsCLI.directoryMd(), ebook);
 
         ebook.setChapters(chapters);
         ebook.setOutputFile(optionsCLI.outputFile());

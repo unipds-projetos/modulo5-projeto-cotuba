@@ -51,8 +51,6 @@ public class GeneratePDF {
                 pdfDocument.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
             });
 
-            System.out.println("Arquivo gerado com sucesso: " + outputFile);
-
         } catch (Exception ex) {
             throw new IllegalStateException("Erro ao gerar PDF: " + outputFile.toAbsolutePath(), ex);
         }

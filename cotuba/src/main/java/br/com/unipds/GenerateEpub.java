@@ -9,6 +9,10 @@ import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.epub.EpubWriter;
 import nl.siegmann.epublib.service.MediatypeService;
 
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -33,34 +37,41 @@ public class GenerateEpub {
                 String titleChapter = chapter.getTitle();
                 String htmlChapter = chapter.getHtml();
 
-                String epubHtml = """
-                          <html xmlns="http://www.w3.org/1999/xhtml">
-                            <head>
-                              <title>%s</title>
-                            </head>
-                            <body>
-                              %s
-                            </body>
-                          </html>
-                        """.formatted(titleChapter, htmlChapter);
+                try {
+                    StringWriter stringWriter = new StringWriter();
+                    XMLStreamWriter writer = XMLOutputFactory.newInstance()
+                            .createXMLStreamWriter(stringWriter);
 
-                Resource chapterResouce = new Resource(epubHtml.getBytes(), MediatypeService.XHTML);
+                    writer.writeStartElement("html");
+                    writer.writeDefaultNamespace("http://www.w3.org/1999/xhtml");
 
-                epub.addSection(
-                        titleChapter,
-                        chapterResouce
-                );
+                    writer.writeStartElement("head");
+                    writer.writeStartElement("title");
+                    writer.writeCharacters(titleChapter);
+                    writer.writeEndElement();
+                    writer.writeEndDocument();
 
-                if (i == 0) {
-                    epub.getGuide().addReference(new GuideReference(chapterResouce, "text", "Start Reading"));
+                    writer.writeStartElement("body");
+                    writer.writeCharacters("");
+                    writer.flush();
+
+                    stringWriter.write(htmlChapter);
+
+                    writer.writeEndElement();
+                    writer.writeEndDocument();
+
+                    writer.close();
+
+                    Resource resourceChapter = new Resource(stringWriter.toString().getBytes(), MediatypeService.XHTML);
+                    epub.addSection(titleChapter, resourceChapter);
+
+                } catch (XMLStreamException e) {
+                    throw new IllegalStateException("Erro ao gerar capitulo do ebook " + chapter.getTitle(), e);
                 }
-
             }
 
             EpubWriter epubWriter = new EpubWriter();
             epubWriter.write(epub, Files.newOutputStream(outputFile));
-
-            System.out.println("Arquivo gerado com sucesso: " + outputFile);
 
         } catch (Exception ex) {
             throw new IllegalStateException("Erro ao gerar EPUB: " + outputFile.toAbsolutePath(), ex);

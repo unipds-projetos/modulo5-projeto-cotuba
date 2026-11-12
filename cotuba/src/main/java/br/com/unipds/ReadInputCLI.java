@@ -13,7 +13,7 @@ import java.util.Locale;
 
 public class ReadInputCLI {
 
-    public OptionsCLI read(String[] args) {
+    public OptionsCLIDTO read(String[] args) {
         var options = new Options();
 
         try {
@@ -82,7 +82,7 @@ public class ReadInputCLI {
 
             boolean verbose = cmd.hasOption("verbose");
 
-            return new OptionsCLI(directoryMD, outputEbook, ebookFormat, verbose);
+            return new OptionsCLIDTO(directoryMD, outputEbook, ebookFormat, verbose);
 
         } catch (ParseException e) {
             System.err.println(e.getMessage());

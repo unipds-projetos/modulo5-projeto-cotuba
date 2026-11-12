@@ -20,12 +20,14 @@ public class Main {
     int executar(String[] args) {
         try {
             ReadInputCLI readInputCLI = new ReadInputCLI();
-            OptionsCLI optionsCLI = readInputCLI.read(args);
+            OptionsCLIDTO optionsCLI = readInputCLI.read(args);
 
             verbose = optionsCLI.verbose();
 
             CotubaService cotubaService = new CotubaService();
             cotubaService.executar(optionsCLI);
+
+            System.out.println("Arquivo gerado com sucesso: " + optionsCLI.outputFile());
 
             return 0;
 
