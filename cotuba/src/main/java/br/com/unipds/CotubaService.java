@@ -3,14 +3,18 @@ package br.com.unipds;
 import br.com.unipds.ebook.Ebook;
 import br.com.unipds.ebook.EbookFormat;
 import br.com.unipds.ebook.chapter.Chapter;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.util.List;
 
+@ApplicationScoped
 public class CotubaService {
 
-    private RenderMarkdown renderMarkdown;
-    private ReaderPropertiesEbook readerPropertiesEbook;
+    private final RenderMarkdown renderMarkdown;
+    private final ReaderPropertiesEbook readerPropertiesEbook;
 
+    @Inject
     public CotubaService(RenderMarkdown renderMarkdown, ReaderPropertiesEbook readerPropertiesEbook) {
         this.renderMarkdown = renderMarkdown;
         this.readerPropertiesEbook = readerPropertiesEbook;
@@ -20,7 +24,6 @@ public class CotubaService {
         List<Chapter> chapters = renderMarkdown.render(optionsCLI.directoryMd());
 
         Ebook ebook = new Ebook();
-
         readerPropertiesEbook.read(optionsCLI.directoryMd(), ebook);
 
         ebook.setChapters(chapters);

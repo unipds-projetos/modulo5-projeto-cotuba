@@ -1,6 +1,7 @@
 package br.com.unipds;
 
 import br.com.unipds.ebook.chapter.Chapter;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.commonmark.node.AbstractVisitor;
 import org.commonmark.node.Heading;
 import org.commonmark.node.Node;
@@ -11,6 +12,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
 import java.nio.file.Path;
 import java.util.List;
 
+@ApplicationScoped
 public class RenderMarkdownCommonmark implements RenderMarkdown {
 
     @Override

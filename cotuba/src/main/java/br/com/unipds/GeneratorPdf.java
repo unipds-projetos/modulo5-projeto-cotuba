@@ -11,11 +11,13 @@ import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.IBlockElement;
 import com.itextpdf.layout.element.IElement;
 import com.itextpdf.layout.properties.AreaBreakType;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+@ApplicationScoped
 public class GeneratorPdf implements GeneratorEbook {
 
     @Override

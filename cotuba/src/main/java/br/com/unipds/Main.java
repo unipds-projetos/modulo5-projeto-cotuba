@@ -1,5 +1,8 @@
 package br.com.unipds;
 
+import jakarta.enterprise.inject.se.SeContainer;
+import jakarta.enterprise.inject.se.SeContainerInitializer;
+
 public class Main {
 
     void main(String[] args) {
@@ -13,16 +16,13 @@ public class Main {
     boolean verbose = true;
 
     int executar(String[] args) {
-        try {
+        try (SeContainer container = SeContainerInitializer.newInstance().initialize()) {
             ReadInputCLI readInputCLI = new ReadInputCLI();
             OptionsCLIDTO optionsCLI = readInputCLI.read(args);
 
             verbose = optionsCLI.verbose();
 
-            CotubaService cotubaService = new CotubaService(
-                    new RenderMarkdownCommonmark(),
-                    new ReaderPropertiesEbookFile()
-            );
+            CotubaService cotubaService = container.select(CotubaService.class).get();
             cotubaService.executar(optionsCLI);
 
             System.out.println("Arquivo gerado com sucesso: " + optionsCLI.outputFile());
