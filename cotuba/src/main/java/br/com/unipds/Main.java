@@ -24,25 +24,8 @@ public class Main {
 
             verbose = optionsCLI.verbose();
 
-            RenderMarkdown renderMarkdown = new RenderMarkdown();
-            List<Chapter> chapters = renderMarkdown.render(optionsCLI.directoryMd());
-
-            Ebook ebook = new Ebook();
-            ebook.setTitle("Teste");
-            ebook.setAuthor("Teste Autor");
-            ebook.setChapters(chapters);
-            ebook.setOutputFile(optionsCLI.outputFile());
-            ebook.setFormat(optionsCLI.fileFormat());
-
-            if (EbookFormat.PDF.equals(ebook.getFormat())) {
-                GeneratePDF pdf = new GeneratePDF();
-                pdf.generate(ebook);
-
-            } else if (EbookFormat.EPUB.equals(ebook.getFormat())) {
-                GenerateEpub epub = new GenerateEpub();
-                epub.generate(ebook);
-
-            }
+            CotubaService cotubaService = new CotubaService();
+            cotubaService.executar(optionsCLI);
 
             return 0;
 
