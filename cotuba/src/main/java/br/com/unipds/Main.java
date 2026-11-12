@@ -1,6 +1,7 @@
 package br.com.unipds;
 
 import br.com.unipds.ebook.EbookFormat;
+import br.com.unipds.ebook.chapter.Chapter;
 
 import java.util.List;
 
@@ -23,15 +24,15 @@ public class Main {
             verbose = optionsCLI.verbose();
 
             RenderMarkdown renderMarkdown = new RenderMarkdown();
-            List<String> htmls = renderMarkdown.render(optionsCLI.directoryMd());
+            List<Chapter> chapters = renderMarkdown.render(optionsCLI.directoryMd());
 
             if (EbookFormat.PDF.equals(optionsCLI.fileFormat())) {
                 GeneratePDF pdf = new GeneratePDF();
-                pdf.generate(htmls, optionsCLI.outputFile());
+                pdf.generate(chapters, optionsCLI.outputFile());
 
             } else if (EbookFormat.EPUB.equals(optionsCLI.fileFormat())) {
                 GenerateEpub epub = new GenerateEpub();
-                epub.generate(htmls, optionsCLI.outputFile());
+                epub.generate(chapters, optionsCLI.outputFile());
 
             } else {
                 throw new IllegalArgumentException("Formato do ebook inválido: " + optionsCLI.fileFormat());

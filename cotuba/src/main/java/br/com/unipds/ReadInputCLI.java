@@ -56,7 +56,7 @@ public class ReadInputCLI {
 
             try {
                 if (fileFormatEbook != null) {
-                    fileFormat = EbookFormat.valueOf(fileFormatEbook);
+                    fileFormat = EbookFormat.valueOf(fileFormatEbook.toUpperCase());
                 } else {
                     fileFormat = EbookFormat.PDF;
                 }

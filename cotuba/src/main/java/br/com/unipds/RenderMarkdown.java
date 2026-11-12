@@ -1,5 +1,6 @@
 package br.com.unipds;
 
+import br.com.unipds.ebook.chapter.Chapter;
 import org.commonmark.node.AbstractVisitor;
 import org.commonmark.node.Heading;
 import org.commonmark.node.Node;
@@ -17,7 +18,7 @@ import java.util.stream.Stream;
 
 public class RenderMarkdown {
 
-    public List<String> render(Path directoryMD) {
+    public List<Chapter> render(Path directoryMD) {
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**/*.md");
         try (Stream<Path> streamMDs = Files.list(directoryMD)) {
             List<Path> arquivosMD = streamMDs
@@ -30,17 +31,25 @@ public class RenderMarkdown {
             }
 
             return arquivosMD.stream().map(arquivoMD -> {
+
+                Chapter chapter = new Chapter();
+
                 Parser parser = Parser.builder().build();
                 Node document = null;
                 try {
-                    document = parser.parseReader(Files.newBufferedReader(arquivoMD));
+                    String markdown = Files.readString(arquivoMD);
+                    chapter.setMarkdown(markdown);
+
+                    chapter.setFileMarkdown(arquivoMD);
+
+                    document = parser.parse(markdown);
                     document.accept(new AbstractVisitor() {
                         @Override
                         public void visit(Heading heading) {
                             if (heading.getLevel() == 1) {
-                                // capítulo
                                 String tituloDoCapitulo = ((Text) heading.getFirstChild()).getLiteral();
-                                // TODO: usar título do capítulo
+                                chapter.setTitle(tituloDoCapitulo);
+
                             } else if (heading.getLevel() == 2) {
                                 // seção
                             } else if (heading.getLevel() == 3) {
@@ -55,7 +64,10 @@ public class RenderMarkdown {
 
                 try {
                     HtmlRenderer renderer = HtmlRenderer.builder().build();
-                    return renderer.render(document);
+                    String html = renderer.render(document);
+
+                    chapter.setHtml(html);
+                    return chapter;
 
                 } catch (Exception ex) {
                     throw new IllegalStateException("Erro ao renderizar para HTML o arquivo " + arquivoMD, ex);
