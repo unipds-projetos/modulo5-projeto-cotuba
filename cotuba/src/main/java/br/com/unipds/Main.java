@@ -1,5 +1,6 @@
 package br.com.unipds;
 
+import br.com.unipds.ebook.Ebook;
 import br.com.unipds.ebook.EbookFormat;
 import br.com.unipds.ebook.chapter.Chapter;
 
@@ -26,17 +27,23 @@ public class Main {
             RenderMarkdown renderMarkdown = new RenderMarkdown();
             List<Chapter> chapters = renderMarkdown.render(optionsCLI.directoryMd());
 
-            if (EbookFormat.PDF.equals(optionsCLI.fileFormat())) {
+            Ebook ebook = new Ebook();
+            ebook.setTitle("Teste");
+            ebook.setAuthor("Teste Autor");
+            ebook.setChapters(chapters);
+            ebook.setOutputFile(optionsCLI.outputFile());
+            ebook.setFormat(optionsCLI.fileFormat());
+
+            if (EbookFormat.PDF.equals(ebook.getFormat())) {
                 GeneratePDF pdf = new GeneratePDF();
-                pdf.generate(chapters, optionsCLI.outputFile());
+                pdf.generate(ebook);
 
-            } else if (EbookFormat.EPUB.equals(optionsCLI.fileFormat())) {
+            } else if (EbookFormat.EPUB.equals(ebook.getFormat())) {
                 GenerateEpub epub = new GenerateEpub();
-                epub.generate(chapters, optionsCLI.outputFile());
+                epub.generate(ebook);
 
-            } else {
-                throw new IllegalArgumentException("Formato do ebook inválido: " + optionsCLI.fileFormat());
             }
+
             return 0;
 
         } catch (Exception ex) {

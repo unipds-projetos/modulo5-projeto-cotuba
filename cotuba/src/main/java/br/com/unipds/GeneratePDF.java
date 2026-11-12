@@ -1,5 +1,6 @@
 package br.com.unipds;
 
+import br.com.unipds.ebook.Ebook;
 import br.com.unipds.ebook.chapter.Chapter;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -18,16 +19,17 @@ import java.util.List;
 
 public class GeneratePDF {
 
-    public void generate(List<Chapter> htmls, Path outputFile) {
+    public void generate(Ebook ebook) {
+        Path outputFile = ebook.getOutputFile();
+
         try (var writer = new PdfWriter(Files.newOutputStream(outputFile));
              var pdf = new PdfDocument(writer);
              var pdfDocument = new Document(pdf)) {
 
-            //TODO: definir título e autor para o livro
-            pdf.getDocumentInfo().setTitle("Livro");
-            pdf.getDocumentInfo().setAuthor("Autor");
+            pdf.getDocumentInfo().setTitle(ebook.getTitle());
+            pdf.getDocumentInfo().setAuthor(ebook.getAuthor());
 
-            htmls.forEach(chapter -> {
+            ebook.getChapters().forEach(chapter -> {
                 List<IElement> convertToElements = HtmlConverter.convertToElements(chapter.getHtml());
 
                 if (pdf.getNumberOfPages() == 0) {

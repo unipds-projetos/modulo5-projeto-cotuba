@@ -1,5 +1,6 @@
 package br.com.unipds;
 
+import br.com.unipds.ebook.Ebook;
 import br.com.unipds.ebook.chapter.Chapter;
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
@@ -14,13 +15,17 @@ import java.util.List;
 
 public class GenerateEpub {
 
-    public void generate(List<Chapter> chapters, Path outputFile) {
+    public void generate(Ebook ebook) {
+        List<Chapter> chapters = ebook.getChapters();
+        Path outputFile = ebook.getOutputFile();
+
         try {
             var epub = new Book();
 
-            //TODO: definir título e autor para o livro
-            epub.getMetadata().addTitle("Livro");
-            epub.getMetadata().addAuthor(new Author("Autor"));
+            epub.getMetadata().addTitle(ebook.getTitle());
+            epub.getMetadata().addAuthor(
+                    new Author(ebook.getAuthor())
+            );
 
             for (int i = 0; i < chapters.size(); i++) {
                 Chapter chapter = chapters.get(i);
