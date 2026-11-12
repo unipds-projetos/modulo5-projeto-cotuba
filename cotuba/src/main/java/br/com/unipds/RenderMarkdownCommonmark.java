@@ -2,6 +2,7 @@ package br.com.unipds;
 
 import br.com.unipds.ebook.chapter.Chapter;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.commonmark.node.AbstractVisitor;
 import org.commonmark.node.Heading;
 import org.commonmark.node.Node;
@@ -15,11 +16,16 @@ import java.util.List;
 @ApplicationScoped
 public class RenderMarkdownCommonmark implements RenderMarkdown {
 
+    private final MarkdownRepository repository;
+
+    @Inject
+    public RenderMarkdownCommonmark(MarkdownRepository repository) {
+        this.repository = repository;
+    }
+
     @Override
     public List<Chapter> render(Path directoryMd) {
-
-        MarkdownRepository markdownRepository = new MarkdownRepository();
-        List<Chapter> chapters = markdownRepository.get(directoryMd);
+        List<Chapter> chapters = repository.get(directoryMd);
 
         return chapters.stream().map(chapter -> {
             Parser parser = Parser.builder().build();

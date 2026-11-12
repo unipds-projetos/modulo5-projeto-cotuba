@@ -1,6 +1,7 @@
 package br.com.unipds;
 
 import br.com.unipds.ebook.chapter.Chapter;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -10,6 +11,7 @@ import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.stream.Stream;
 
+@ApplicationScoped
 public class MarkdownRepository {
 
     public List<Chapter> get(Path directoryMd) {
