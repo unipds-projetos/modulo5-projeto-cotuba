@@ -1,7 +1,6 @@
 package br.com.unipds;
 
 import br.com.unipds.ebook.Ebook;
-import br.com.unipds.ebook.chapter.Chapter;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfOutline;
@@ -17,7 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-public class GeneratePDF implements Generator {
+public class GeneratePDF implements GeneratorEbook {
 
     @Override
     public void generate(Ebook ebook) {

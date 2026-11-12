@@ -4,7 +4,6 @@ import br.com.unipds.ebook.Ebook;
 import br.com.unipds.ebook.chapter.Chapter;
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
-import nl.siegmann.epublib.domain.GuideReference;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.epub.EpubWriter;
 import nl.siegmann.epublib.service.MediatypeService;
@@ -17,7 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-public class GenerateEpub implements Generator {
+public class GenerateEpub implements GeneratorEbook {
 
     @Override
     public void generate(Ebook ebook) {
