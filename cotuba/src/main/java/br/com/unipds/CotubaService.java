@@ -21,14 +21,18 @@ public class CotubaService {
         ebook.setOutputFile(optionsCLI.outputFile());
         ebook.setFormat(optionsCLI.fileFormat());
 
+        GeneratorEbook generatorEbook = null;
+
         if (EbookFormat.PDF.equals(ebook.getFormat())) {
-            GeneratePDF pdf = new GeneratePDF();
-            pdf.generate(ebook);
+            generatorEbook = new GeneratorPdf();
 
         } else if (EbookFormat.EPUB.equals(ebook.getFormat())) {
-            GenerateEpub epub = new GenerateEpub();
-            epub.generate(ebook);
+            generatorEbook = new GeneratorEpub();
+        } else {
+            throw new IllegalArgumentException("Formato do Ebook inválido: " + optionsCLI.fileFormat());
         }
+
+        generatorEbook.generate(ebook);
 
     }
 
