@@ -16,18 +16,9 @@ import java.util.List;
 @ApplicationScoped
 public class RenderMarkdownCommonmark implements RenderMarkdown {
 
-    private final MarkdownRepository repository;
-
-    @Inject
-    public RenderMarkdownCommonmark(MarkdownRepository repository) {
-        this.repository = repository;
-    }
-
     @Override
-    public List<Chapter> render(Path directoryMd) {
-        List<Chapter> chapters = repository.get(directoryMd);
-
-        return chapters.stream().map(chapter -> {
+    public void render(List<Chapter> chapters) {
+        chapters.stream().map(chapter -> {
             Parser parser = Parser.builder().build();
             Node document = null;
 

@@ -13,15 +13,18 @@ public class CotubaService {
 
     private final RenderMarkdown renderMarkdown;
     private final ReaderPropertiesEbook readerPropertiesEbook;
+    private final MarkdownRepository markdownRepository;
 
     @Inject
-    public CotubaService(RenderMarkdown renderMarkdown, ReaderPropertiesEbook readerPropertiesEbook) {
+    public CotubaService(RenderMarkdown renderMarkdown, ReaderPropertiesEbook readerPropertiesEbook, MarkdownRepository markdownRepository) {
         this.renderMarkdown = renderMarkdown;
         this.readerPropertiesEbook = readerPropertiesEbook;
+        this.markdownRepository = markdownRepository;
     }
 
     public void executar(OptionsCLIDTO optionsCLI) {
-        List<Chapter> chapters = renderMarkdown.render(optionsCLI.directoryMd());
+        List<Chapter> chapters = markdownRepository.get(optionsCLI.directoryMd());
+        renderMarkdown.render(chapters);
 
         Ebook ebook = new Ebook();
         readerPropertiesEbook.read(optionsCLI.directoryMd(), ebook);
