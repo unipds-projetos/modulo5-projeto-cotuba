@@ -1,16 +1,11 @@
 package br.com.unipds;
 
-import br.com.unipds.ebook.Ebook;
-import br.com.unipds.ebook.EbookFormat;
-import br.com.unipds.ebook.chapter.Chapter;
-
-import java.util.List;
-
 public class Main {
 
     void main(String[] args) {
         int exitCode = executar(args);
         if (exitCode != 0) {
+            System.out.println("Exit Code: " + exitCode);
             System.exit(exitCode);
         }
     }

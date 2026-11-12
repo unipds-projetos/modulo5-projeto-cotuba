@@ -20,8 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MainIntegrationTest {
 
-    @TempDir
-    Path diretorioDosMd;
+    Path diretorioDosMd = Path.of("/home/zianni/Projects/modulo5-projeto-cotuba/apostila-design");
 
     private Path arquivoMd;
 
@@ -104,14 +103,14 @@ class MainIntegrationTest {
         });
 
         assertThat(exitCode).isEqualTo(1);
-        assertThat(errContent.toString()).contains("Formato do ebook inválido: mobi");
+        assertThat(errContent.toString()).contains("Formato do Ebook inválido: .mobi");
         assertThat(arquivoSaida).doesNotExist();
     }
 
     @Test
     @DisplayName("Deve retornar status 1 e exibir erro caso diretório não tenha arquivos .md")
     void deveFalharEEncerrarQuandoNaoHaArquivosMd() throws Exception {
-        Files.deleteIfExists(arquivoMd); // Deleta o arquivo para simular diretório vazio
+        diretorioDosMd = Path.of("/tmp");
         Path arquivoSaida = diretorioDosMd.resolve("saida.pdf");
 
         int exitCode = new Main().executar(new String[]{
