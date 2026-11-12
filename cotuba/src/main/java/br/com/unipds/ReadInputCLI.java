@@ -1,5 +1,6 @@
-package br.com.unipds.cli;
+package br.com.unipds;
 
+import br.com.unipds.ebook.EbookFormat;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -8,15 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.Locale;
 
 public class ReadInputCLI {
 
-    private Path directoryMD;
-    private String fileFormat;
-    private Path outputFile;
-    private boolean verbose;
-
-    public void read(String[] args) {
+    public OptionsCLI read(String[] args) {
         var options = new Options();
 
         try {
@@ -41,6 +38,7 @@ public class ReadInputCLI {
 
             String nameDirectoryMD = cmd.getOptionValue("dir");
 
+            Path directoryMD;
             if (nameDirectoryMD != null) {
                 directoryMD = Paths.get(nameDirectoryMD);
                 if (!Files.isDirectory(directoryMD)) {
@@ -50,33 +48,41 @@ public class ReadInputCLI {
                 directoryMD = Paths.get("");
             }
 
+            EbookFormat ebookFormat;
             String fileFormatEbook = cmd.getOptionValue("format");
 
-            if (fileFormatEbook != null) {
-                fileFormat = fileFormatEbook.toLowerCase();
-            } else {
-                fileFormat = "pdf";
+            try {
+                if (fileFormatEbook != null) {
+                    ebookFormat = EbookFormat.valueOf(fileFormatEbook.toUpperCase());
+                } else {
+                    ebookFormat = EbookFormat.PDF;
+                }
+            } catch (IllegalArgumentException ex) {
+                throw new IllegalArgumentException("Formato do Ebook inválido: ." + fileFormatEbook.toLowerCase());
             }
 
+            Path outputEbook;
             try {
                 String nameOutputFile = cmd.getOptionValue("output");
                 if (nameOutputFile != null) {
-                    outputFile = Paths.get(nameOutputFile);
+                    outputEbook = Paths.get(nameOutputFile);
                 } else {
-                    outputFile = Paths.get("book." + fileFormat.toLowerCase());
+                    outputEbook = Paths.get("book." + ebookFormat.name().toLowerCase());
                 }
-                if (Files.isDirectory(outputFile)) {
+                if (Files.isDirectory(outputEbook)) {
                     // deleta arquivos do diretório recursivamente
-                    Files.walk(outputFile).sorted(Comparator.reverseOrder())
+                    Files.walk(outputEbook).sorted(Comparator.reverseOrder())
                             .map(Path::toFile).forEach(File::delete);
                 } else {
-                    Files.deleteIfExists(outputFile);
+                    Files.deleteIfExists(outputEbook);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
-            verbose = cmd.hasOption("verbose");
+            boolean verbose = cmd.hasOption("verbose");
+
+            return new OptionsCLI(directoryMD, outputEbook, ebookFormat, verbose);
 
         } catch (ParseException e) {
             System.err.println(e.getMessage());
@@ -86,22 +92,6 @@ public class ReadInputCLI {
 
             throw new IllegalStateException();
         }
-    }
-
-    public Path getDirectoryMD() {
-        return directoryMD;
-    }
-
-    public String getFileFormat() {
-        return fileFormat;
-    }
-
-    public Path getOutputFile() throws IOException {
-        return outputFile;
-    }
-
-    public boolean isVerbose() {
-        return verbose;
     }
 
 }
