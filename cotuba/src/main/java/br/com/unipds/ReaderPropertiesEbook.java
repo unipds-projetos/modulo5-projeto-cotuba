@@ -6,5 +6,5 @@ import br.com.unipds.ebook.EbookBuilder;
 import java.nio.file.Path;
 
 public interface ReaderPropertiesEbook {
-    void read(Path directoryMd, EbookBuilder ebookBuilder);
+    EbookProperties read(Path directoryMd);
 }
