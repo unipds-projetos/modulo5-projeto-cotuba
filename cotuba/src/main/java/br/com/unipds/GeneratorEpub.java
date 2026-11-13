@@ -38,8 +38,8 @@ public class GeneratorEpub implements GeneratorEbook {
             for (int i = 0; i < chapters.size(); i++) {
                 Chapter chapter = chapters.get(i);
 
-                String titleChapter = chapter.getTitle();
-                String htmlChapter = chapter.getHtml();
+                String titleChapter = chapter.title();
+                String htmlChapter = chapter.html();
 
                 try {
                     StringWriter stringWriter = new StringWriter();
@@ -70,7 +70,7 @@ public class GeneratorEpub implements GeneratorEbook {
                     epub.addSection(titleChapter, resourceChapter);
 
                 } catch (XMLStreamException e) {
-                    throw new IllegalStateException("Erro ao gerar capitulo do ebook " + chapter.getTitle(), e);
+                    throw new IllegalStateException("Erro ao gerar capitulo do ebook " + titleChapter, e);
                 }
             }
 

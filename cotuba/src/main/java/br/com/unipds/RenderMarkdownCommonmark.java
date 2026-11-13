@@ -1,6 +1,7 @@
 package br.com.unipds;
 
 import br.com.unipds.ebook.chapter.Chapter;
+import br.com.unipds.ebook.chapter.ChapterBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.commonmark.node.AbstractVisitor;
@@ -17,22 +18,23 @@ import java.util.List;
 public class RenderMarkdownCommonmark implements RenderMarkdown {
 
     @Override
-    public void render(List<Chapter> chapters) {
+    public List<Chapter> render(List<Markdown> markdowns) {
+        return markdowns.stream().map(markdown -> {
 
-        chapters.forEach(chapter -> {
+            ChapterBuilder chapterBuilder = ChapterBuilder.builder();
+            chapterBuilder.markdown(markdown);
+
             Parser parser = Parser.builder().build();
             Node document = null;
 
-            Path fileMd = chapter.getFileMarkdown();
-
-            try {;
-                document = parser.parse(chapter.getMarkdown());
+            try {
+                document = parser.parse(markdown.content());
                 document.accept(new AbstractVisitor() {
                     @Override
                     public void visit(Heading heading) {
                         if (heading.getLevel() == 1) {
-                            String tituloDoCapitulo = ((Text) heading.getFirstChild()).getLiteral();
-                            chapter.setTitle(tituloDoCapitulo);
+                            String chapterTitle = ((Text) heading.getFirstChild()).getLiteral();
+                            chapterBuilder.title(chapterTitle);
 
                         } else if (heading.getLevel() == 2) {
                             // seção
@@ -42,18 +44,21 @@ public class RenderMarkdownCommonmark implements RenderMarkdown {
                     }
 
                 });
+
             } catch (Exception ex) {
-                throw new IllegalStateException("Erro ao fazer parse do arquivo " + fileMd, ex);
+                throw new IllegalStateException("Erro ao fazer parse do arquivo " + markdown.file(), ex);
             }
 
             try {
                 HtmlRenderer renderer = HtmlRenderer.builder().build();
                 String html = renderer.render(document);
 
-                chapter.setHtml(html);
+                chapterBuilder.html(html);
+
             } catch (Exception ex) {
-                throw new IllegalStateException("Erro ao renderizar para HTML o arquivo " + fileMd, ex);
+                throw new IllegalStateException("Erro ao renderizar para HTML o arquivo " + markdown.file(), ex);
             }
-        });
+            return chapterBuilder.build();
+        }).toList();
     }
 }

@@ -26,8 +26,8 @@ public class CotubaService {
     }
 
     public void executar(OptionsCLIDTO optionsCLI) {
-        List<Chapter> chapters = markdownRepository.get(optionsCLI.directoryMd());
-        renderMarkdown.render(chapters);
+        List<Markdown> markdowns = markdownRepository.get(optionsCLI.directoryMd());
+        List<Chapter> chapters = renderMarkdown.render(markdowns);
 
         Ebook ebook = new Ebook();
         readerPropertiesEbook.read(optionsCLI.directoryMd(), ebook);

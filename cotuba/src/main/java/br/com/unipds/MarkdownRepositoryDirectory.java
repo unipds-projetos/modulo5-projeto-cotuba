@@ -9,12 +9,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @ApplicationScoped
 public class MarkdownRepositoryDirectory implements MarkdownRepository {
 
-    public List<Chapter> get(Path directoryMd) {
+    public List<Markdown> get(Path directoryMd) {
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**/*.md");
         try (Stream<Path> streamMDs = Files.list(directoryMd)) {
             List<Path> filesMd = streamMDs
@@ -28,15 +29,11 @@ public class MarkdownRepositoryDirectory implements MarkdownRepository {
 
             return filesMd.stream().map(fileMd -> {
                 try {
-                    Chapter chapter = new Chapter();
+                    String content = Files.readString(fileMd);
+                    return new Markdown(content, fileMd);
 
-                    String markdown = Files.readString(fileMd);
-                    chapter.setMarkdown(markdown);
-                    chapter.setFileMarkdown(fileMd);
-
-                    return chapter;
                 } catch (IOException e) {
-                    throw new IllegalStateException("Erro ao leo arquivo: " + fileMd);
+                    throw new IllegalStateException("Erro ao ler arquivo: " + fileMd);
                 }
             }).toList();
 

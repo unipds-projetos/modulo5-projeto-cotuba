@@ -54,7 +54,7 @@ public class GeneratorHtml implements GeneratorEbook {
                     %s
                 </body>
                 </html>
-                """.formatted(chapter.getTitle(), chapter.getHtml());
+                """.formatted(chapter.title(), chapter.html());
 
         try {
             Files.writeString(fileHtml, html, StandardCharsets.UTF_8);
@@ -69,7 +69,7 @@ public class GeneratorHtml implements GeneratorEbook {
                     <li>
                         <a href="%s">%s</a>
                     </li>
-                    """.formatted(fileHtmlChapter.get(chapter).getFileName(), chapter.getTitle())
+                    """.formatted(fileHtmlChapter.get(chapter).getFileName(), chapter.title())
         ).collect(Collectors.joining());
 
         String summaryHtml = """
@@ -98,7 +98,7 @@ public class GeneratorHtml implements GeneratorEbook {
     }
 
     private String getNameFileHtml(int i, Chapter chapter) {
-        String cleanTitle = chapter.getTitle().toLowerCase().replaceAll("\\W", "");
+        String cleanTitle = chapter.title().toLowerCase().replaceAll("\\W", "");
         return "%02d-%s.html".formatted(i, cleanTitle);
     }
 

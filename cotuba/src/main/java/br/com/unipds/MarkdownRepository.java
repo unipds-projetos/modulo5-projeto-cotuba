@@ -6,5 +6,5 @@ import java.nio.file.Path;
 import java.util.List;
 
 public interface MarkdownRepository {
-    List<Chapter> get(Path directoryMd);
+    List<Markdown> get(Path directoryMd);
 }
