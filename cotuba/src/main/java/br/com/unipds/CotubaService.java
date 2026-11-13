@@ -1,6 +1,7 @@
 package br.com.unipds;
 
 import br.com.unipds.ebook.Ebook;
+import br.com.unipds.ebook.EbookBuilder;
 import br.com.unipds.ebook.chapter.Chapter;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
@@ -29,16 +30,15 @@ public class CotubaService {
         List<Markdown> markdowns = markdownRepository.get(optionsCLI.directoryMd());
         List<Chapter> chapters = renderMarkdown.render(markdowns);
 
-        Ebook ebook = new Ebook();
-        readerPropertiesEbook.read(optionsCLI.directoryMd(), ebook);
+        EbookBuilder ebookBuilder = EbookBuilder.builder();
+        readerPropertiesEbook.read(optionsCLI.directoryMd(), ebookBuilder);
 
-        ebook.setChapters(chapters);
-        ebook.setOutputFile(optionsCLI.outputFile());
-        ebook.setFormat(optionsCLI.fileFormat());
+        ebookBuilder.chapters(chapters);
+        ebookBuilder.outputFile(optionsCLI.outputFile());
+        ebookBuilder.format(optionsCLI.fileFormat());
 
         GeneratorEbook generatorEbook = generatorEbooks.select(EbookFormatFilter.of(optionsCLI.fileFormat())).get();
-        generatorEbook.generate(ebook);
-
+        generatorEbook.generate(ebookBuilder.build());
     }
 
 }

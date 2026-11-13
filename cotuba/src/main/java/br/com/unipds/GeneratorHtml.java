@@ -19,13 +19,13 @@ public class GeneratorHtml implements GeneratorEbook {
 
     @Override
     public void generate(Ebook ebook) {
-         Path fileOutput = ebook.getOutputFile();
+         Path fileOutput = ebook.outputFile();
         try {
             Path directoryHtml = Files.createDirectory(fileOutput);
 
             int i = 1;
             Map<Chapter, Path> fileHtmlChapter = new LinkedHashMap<>();
-            for (Chapter chapter : ebook.getChapters()) {
+            for (Chapter chapter : ebook.chapters()) {
                 String nameFileHtml = getNameFileHtml(i, chapter);
                 Path fileHtml = directoryHtml.resolve(nameFileHtml);
 
@@ -64,7 +64,7 @@ public class GeneratorHtml implements GeneratorEbook {
     }
 
     private void writeSummary(Ebook ebook, Path directoryHtml, Map<Chapter, Path> fileHtmlChapter) {
-        String itemsSummaryHtml = ebook.getChapters().stream().map(chapter ->
+        String itemsSummaryHtml = ebook.chapters().stream().map(chapter ->
             """
                     <li>
                         <a href="%s">%s</a>
@@ -88,7 +88,7 @@ public class GeneratorHtml implements GeneratorEbook {
                     </ul>
                 </body>
                 </html>
-                """.formatted(ebook.getTitle(), ebook.getTitle(), ebook.getAuthor(), itemsSummaryHtml);
+                """.formatted(ebook.title(), ebook.title(), ebook.author(), itemsSummaryHtml);
         Path fileIndexHtml = directoryHtml.resolve("index.html");
         try {
             Files.writeString(fileIndexHtml, summaryHtml);

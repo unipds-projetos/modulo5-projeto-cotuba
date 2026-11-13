@@ -24,16 +24,16 @@ public class GeneratorPdf implements GeneratorEbook {
 
     @Override
     public void generate(Ebook ebook) {
-        Path outputFile = ebook.getOutputFile();
+        Path outputFile = ebook.outputFile();
 
         try (var writer = new PdfWriter(Files.newOutputStream(outputFile));
              var pdf = new PdfDocument(writer);
              var pdfDocument = new Document(pdf)) {
 
-            pdf.getDocumentInfo().setTitle(ebook.getTitle());
-            pdf.getDocumentInfo().setAuthor(ebook.getAuthor());
+            pdf.getDocumentInfo().setTitle(ebook.title());
+            pdf.getDocumentInfo().setAuthor(ebook.author());
 
-            ebook.getChapters().forEach(chapter -> {
+            ebook.chapters().forEach(chapter -> {
                 List<IElement> convertToElements = HtmlConverter.convertToElements(chapter.html());
 
                 if (pdf.getNumberOfPages() == 0) {
