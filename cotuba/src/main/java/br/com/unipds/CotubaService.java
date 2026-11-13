@@ -1,9 +1,10 @@
 package br.com.unipds;
 
 import br.com.unipds.ebook.Ebook;
-import br.com.unipds.ebook.EbookFormat;
 import br.com.unipds.ebook.chapter.Chapter;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Any;
+import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 
 import java.util.List;
@@ -14,12 +15,14 @@ public class CotubaService {
     private final RenderMarkdown renderMarkdown;
     private final ReaderPropertiesEbook readerPropertiesEbook;
     private final MarkdownRepository markdownRepository;
+    private final Instance<GeneratorEbook> generatorEbooks;
 
     @Inject
-    public CotubaService(RenderMarkdown renderMarkdown, ReaderPropertiesEbook readerPropertiesEbook, MarkdownRepositoryDirectory markdownRepository) {
+    public CotubaService(RenderMarkdown renderMarkdown, ReaderPropertiesEbook readerPropertiesEbook, MarkdownRepositoryDirectory markdownRepository, @Any Instance<GeneratorEbook> generatorEbooks) {
         this.renderMarkdown = renderMarkdown;
         this.readerPropertiesEbook = readerPropertiesEbook;
         this.markdownRepository = markdownRepository;
+        this.generatorEbooks = generatorEbooks;
     }
 
     public void executar(OptionsCLIDTO optionsCLI) {
@@ -33,17 +36,7 @@ public class CotubaService {
         ebook.setOutputFile(optionsCLI.outputFile());
         ebook.setFormat(optionsCLI.fileFormat());
 
-        GeneratorEbook generatorEbook = null;
-
-        if (EbookFormat.PDF.equals(ebook.getFormat())) {
-            generatorEbook = new GeneratorPdf();
-
-        } else if (EbookFormat.EPUB.equals(ebook.getFormat())) {
-            generatorEbook = new GeneratorEpub();
-        } else {
-            throw new IllegalArgumentException("Formato do Ebook inválido: " + optionsCLI.fileFormat());
-        }
-
+        GeneratorEbook generatorEbook = generatorEbooks.select(EbookFormatFilter.of(optionsCLI.fileFormat())).get();
         generatorEbook.generate(ebook);
 
     }
