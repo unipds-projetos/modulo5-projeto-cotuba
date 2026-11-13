@@ -18,7 +18,7 @@ public class Main {
     int executar(String[] args) {
         try (SeContainer container = SeContainerInitializer.newInstance().initialize()) {
             ReadInputCLI readInputCLI = container.select(ReadInputCLI.class).get();
-            OptionsCLIDTO optionsCLI = readInputCLI.read(args);
+            CotubaParams optionsCLI = readInputCLI.read(args);
 
             verbose = optionsCLI.verbose();
 

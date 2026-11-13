@@ -26,7 +26,7 @@ public class CotubaService {
         this.generatorEbooks = generatorEbooks;
     }
 
-    public void executar(OptionsCLIDTO optionsCLI) {
+    public void executar(CotubaParams optionsCLI) {
         List<Markdown> markdowns = markdownRepository.get(optionsCLI.directoryMd());
         List<Chapter> chapters = renderMarkdown.render(markdowns);
 

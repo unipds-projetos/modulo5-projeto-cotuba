@@ -15,7 +15,7 @@ import java.util.Locale;
 @ApplicationScoped
 public class ReadInputCLI {
 
-    public OptionsCLIDTO read(String[] args) {
+    public CotubaParams read(String[] args) {
         var options = new Options();
 
         try {
@@ -84,7 +84,7 @@ public class ReadInputCLI {
 
             boolean verbose = cmd.hasOption("verbose");
 
-            return new OptionsCLIDTO(directoryMD, outputEbook, ebookFormat, verbose);
+            return new CotubaParams(directoryMD, outputEbook, ebookFormat, verbose);
 
         } catch (ParseException e) {
             System.err.println(e.getMessage());
