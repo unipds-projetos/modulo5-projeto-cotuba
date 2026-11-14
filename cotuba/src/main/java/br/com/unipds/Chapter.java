@@ -1,6 +1,5 @@
-package br.com.unipds.ebook.chapter;
+package br.com.unipds;
 
-import br.com.unipds.Markdown;
 import io.soabase.recordbuilder.core.RecordBuilder;
 import org.jmolecules.ddd.annotation.Entity;
 import org.jmolecules.ddd.annotation.Identity;

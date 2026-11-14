@@ -1,6 +1,5 @@
 package br.com.unipds;
 
-import br.com.unipds.ebook.EbookFormat;
 import jakarta.inject.Qualifier;
 
 import java.lang.annotation.ElementType;

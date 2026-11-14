@@ -1,4 +1,4 @@
-package br.com.unipds.ebook;
+package br.com.unipds;
 
 import org.jmolecules.ddd.annotation.ValueObject;
 

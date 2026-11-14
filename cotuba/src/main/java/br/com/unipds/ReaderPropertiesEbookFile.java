@@ -1,7 +1,5 @@
 package br.com.unipds;
 
-import br.com.unipds.ebook.Ebook;
-import br.com.unipds.ebook.EbookBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.io.IOException;

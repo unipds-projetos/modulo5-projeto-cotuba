@@ -1,7 +1,5 @@
 package br.com.unipds;
 
-import br.com.unipds.ebook.Ebook;
-import br.com.unipds.ebook.EbookFormat;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfOutline;

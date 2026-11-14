@@ -1,6 +1,5 @@
 package br.com.unipds;
 
-import br.com.unipds.ebook.EbookFormat;
 import jakarta.enterprise.util.AnnotationLiteral;
 
 public class EbookFormatFilter extends AnnotationLiteral<EbookFormatQualifier> implements EbookFormatQualifier {

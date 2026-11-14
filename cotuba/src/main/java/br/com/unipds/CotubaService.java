@@ -1,8 +1,6 @@
 package br.com.unipds;
 
-import br.com.unipds.ebook.Ebook;
 import br.com.unipds.ebook.EbookBuilder;
-import br.com.unipds.ebook.chapter.Chapter;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
