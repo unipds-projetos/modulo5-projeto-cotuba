@@ -1,4 +1,4 @@
-package br.com.unipds;
+package br.com.unipds.cotuba.domain;
 
 import org.jmolecules.ddd.annotation.ValueObject;
 

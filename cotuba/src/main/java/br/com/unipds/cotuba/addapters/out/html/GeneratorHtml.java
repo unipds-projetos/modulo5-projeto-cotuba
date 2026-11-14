@@ -1,5 +1,10 @@
-package br.com.unipds;
+package br.com.unipds.cotuba.addapters.out.html;
 
+import br.com.unipds.cotuba.support.EbookFormatQualifier;
+import br.com.unipds.cotuba.domain.Chapter;
+import br.com.unipds.cotuba.domain.Ebook;
+import br.com.unipds.cotuba.domain.EbookFormat;
+import br.com.unipds.cotuba.ports.out.GeneratorEbook;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.io.IOException;

@@ -1,5 +1,7 @@
-package br.com.unipds;
+package br.com.unipds.cotuba.cli;
 
+import br.com.unipds.cotuba.application.CotubaService;
+import br.com.unipds.cotuba.dto.CotubaParams;
 import jakarta.enterprise.inject.se.SeContainer;
 import jakarta.enterprise.inject.se.SeContainerInitializer;
 
@@ -15,7 +17,7 @@ public class Main {
 
     boolean verbose = true;
 
-    int executar(String[] args) {
+    public int executar(String[] args) {
         try (SeContainer container = SeContainerInitializer.newInstance().initialize()) {
             ReadInputCLI readInputCLI = container.select(ReadInputCLI.class).get();
             CotubaParams optionsCLI = readInputCLI.read(args);

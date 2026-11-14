@@ -1,5 +1,7 @@
-package br.com.unipds;
+package br.com.unipds.cotuba.addapters.out.config;
 
+import br.com.unipds.cotuba.dto.EbookProperties;
+import br.com.unipds.cotuba.ports.out.ReaderPropertiesEbook;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.io.IOException;

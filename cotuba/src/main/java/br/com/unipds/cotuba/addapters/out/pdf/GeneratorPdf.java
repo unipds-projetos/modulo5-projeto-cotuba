@@ -1,5 +1,9 @@
-package br.com.unipds;
+package br.com.unipds.cotuba.addapters.out.pdf;
 
+import br.com.unipds.cotuba.support.EbookFormatQualifier;
+import br.com.unipds.cotuba.domain.Ebook;
+import br.com.unipds.cotuba.domain.EbookFormat;
+import br.com.unipds.cotuba.ports.out.GeneratorEbook;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfOutline;

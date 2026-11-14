@@ -1,6 +1,17 @@
-package br.com.unipds;
+package br.com.unipds.cotuba.application;
 
-import br.com.unipds.ebook.EbookBuilder;
+import br.com.unipds.cotuba.addapters.out.md.MarkdownRepositoryDirectory;
+import br.com.unipds.cotuba.domain.Chapter;
+import br.com.unipds.cotuba.domain.Ebook;
+import br.com.unipds.cotuba.domain.EbookBuilder;
+import br.com.unipds.cotuba.domain.Markdown;
+import br.com.unipds.cotuba.dto.CotubaParams;
+import br.com.unipds.cotuba.dto.EbookProperties;
+import br.com.unipds.cotuba.ports.out.GeneratorEbook;
+import br.com.unipds.cotuba.ports.out.MarkdownRepository;
+import br.com.unipds.cotuba.ports.out.ReaderPropertiesEbook;
+import br.com.unipds.cotuba.ports.out.RenderMarkdown;
+import br.com.unipds.cotuba.support.EbookFormatFilter;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;

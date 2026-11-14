@@ -1,5 +1,7 @@
-package br.com.unipds;
+package br.com.unipds.cotuba.cli;
 
+import br.com.unipds.cotuba.domain.EbookFormat;
+import br.com.unipds.cotuba.dto.CotubaParams;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.commons.cli.*;
 

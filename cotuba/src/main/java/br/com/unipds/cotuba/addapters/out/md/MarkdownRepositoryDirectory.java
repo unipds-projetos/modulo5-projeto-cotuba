@@ -1,7 +1,8 @@
-package br.com.unipds;
+package br.com.unipds.cotuba.addapters.out.md;
 
+import br.com.unipds.cotuba.domain.Markdown;
+import br.com.unipds.cotuba.ports.out.MarkdownRepository;
 import jakarta.enterprise.context.ApplicationScoped;
-import org.jmolecules.ddd.annotation.Repository;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;

@@ -1,6 +1,9 @@
-package br.com.unipds;
+package br.com.unipds.cotuba.addapters.out.md;
 
-import br.com.unipds.ebook.chapter.ChapterBuilder;
+import br.com.unipds.cotuba.domain.Chapter;
+import br.com.unipds.cotuba.domain.ChapterBuilder;
+import br.com.unipds.cotuba.domain.Markdown;
+import br.com.unipds.cotuba.ports.out.RenderMarkdown;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.commonmark.node.AbstractVisitor;
 import org.commonmark.node.Heading;

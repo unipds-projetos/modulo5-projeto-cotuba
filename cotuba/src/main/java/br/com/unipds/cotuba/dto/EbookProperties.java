@@ -1,4 +1,4 @@
-package br.com.unipds;
+package br.com.unipds.cotuba.dto;
 
 public record EbookProperties(
         String title,
