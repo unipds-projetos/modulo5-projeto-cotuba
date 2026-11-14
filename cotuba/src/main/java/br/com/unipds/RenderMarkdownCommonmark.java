@@ -46,7 +46,7 @@ public class RenderMarkdownCommonmark implements RenderMarkdown {
                 });
 
             } catch (Exception ex) {
-                throw new IllegalStateException("Erro ao fazer parse do arquivo " + markdown.file(), ex);
+                throw new IllegalStateException("Erro ao fazer parse do arquivo " + markdown.fileName(), ex);
             }
 
             try {
@@ -56,7 +56,7 @@ public class RenderMarkdownCommonmark implements RenderMarkdown {
                 chapterBuilder.html(html);
 
             } catch (Exception ex) {
-                throw new IllegalStateException("Erro ao renderizar para HTML o arquivo " + markdown.file(), ex);
+                throw new IllegalStateException("Erro ao renderizar para HTML o arquivo " + markdown.fileName(), ex);
             }
             return chapterBuilder.build();
         }).toList();

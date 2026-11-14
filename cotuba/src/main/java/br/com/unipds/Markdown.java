@@ -1,9 +1,12 @@
 package br.com.unipds;
 
-import java.nio.file.Path;
+import org.jmolecules.ddd.annotation.Entity;
+import org.jmolecules.ddd.annotation.Identity;
 
+@Entity
 public record Markdown(
-        String content,
-        Path file
+        @Identity
+        String fileName,
+        String content
 ) {
 }

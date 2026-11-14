@@ -30,7 +30,7 @@ public class MarkdownRepositoryDirectory implements MarkdownRepository {
             return filesMd.stream().map(fileMd -> {
                 try {
                     String content = Files.readString(fileMd);
-                    return new Markdown(content, fileMd);
+                    return new Markdown(fileMd.getFileName().toString(), content);
 
                 } catch (IOException e) {
                     throw new IllegalStateException("Erro ao ler arquivo: " + fileMd);
