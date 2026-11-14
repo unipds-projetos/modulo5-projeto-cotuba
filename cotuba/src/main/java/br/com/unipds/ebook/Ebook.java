@@ -15,7 +15,6 @@ public record Ebook(
         String title,
         String author,
         EbookFormat format,
-        List<Chapter> chapters,
-        Path outputFile
+        List<Chapter> chapters
 ) {
 }

@@ -1,10 +1,11 @@
 package br.com.unipds;
 
-import br.com.unipds.ebook.chapter.Chapter;
+import org.jmolecules.ddd.annotation.Repository;
 
 import java.nio.file.Path;
 import java.util.List;
 
+@Repository
 public interface MarkdownRepository {
     List<Markdown> get(Path directoryMd);
 }

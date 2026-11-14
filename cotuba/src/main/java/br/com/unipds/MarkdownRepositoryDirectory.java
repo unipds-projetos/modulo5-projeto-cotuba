@@ -1,7 +1,7 @@
 package br.com.unipds;
 
-import br.com.unipds.ebook.chapter.Chapter;
 import jakarta.enterprise.context.ApplicationScoped;
+import org.jmolecules.ddd.annotation.Repository;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @ApplicationScoped

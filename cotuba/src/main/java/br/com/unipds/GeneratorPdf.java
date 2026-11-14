@@ -23,9 +23,7 @@ import java.util.List;
 public class GeneratorPdf implements GeneratorEbook {
 
     @Override
-    public void generate(Ebook ebook) {
-        Path outputFile = ebook.outputFile();
-
+    public void generate(Ebook ebook, Path outputFile) {
         try (var writer = new PdfWriter(Files.newOutputStream(outputFile));
              var pdf = new PdfDocument(writer);
              var pdfDocument = new Document(pdf)) {

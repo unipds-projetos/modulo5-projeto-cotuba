@@ -18,10 +18,9 @@ import java.util.stream.Collectors;
 public class GeneratorHtml implements GeneratorEbook {
 
     @Override
-    public void generate(Ebook ebook) {
-         Path fileOutput = ebook.outputFile();
+    public void generate(Ebook ebook, Path outputFile) {
         try {
-            Path directoryHtml = Files.createDirectory(fileOutput);
+            Path directoryHtml = Files.createDirectory(outputFile);
 
             int i = 1;
             Map<Chapter, Path> fileHtmlChapter = new LinkedHashMap<>();
@@ -38,7 +37,7 @@ public class GeneratorHtml implements GeneratorEbook {
             writeSummary(ebook, directoryHtml, fileHtmlChapter);
 
         } catch (IOException e) {
-            throw new IllegalStateException("Erro ao criar Ebook HTML: " + fileOutput, e);
+            throw new IllegalStateException("Erro ao criar Ebook HTML: " + outputFile, e);
         }
     }
 

@@ -7,9 +7,11 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
+import org.jmolecules.ddd.annotation.Service;
 
 import java.util.List;
 
+@Service
 @ApplicationScoped
 public class CotubaService {
 
@@ -35,13 +37,12 @@ public class CotubaService {
         Ebook ebook = EbookBuilder.builder()
                         .chapters(chapters)
                         .format(optionsCLI.fileFormat())
-                        .outputFile(optionsCLI.outputFile())
                         .title(ebookProperties.title())
                         .author(ebookProperties.author())
                         .build();
 
         GeneratorEbook generatorEbook = generatorEbooks.select(EbookFormatFilter.of(optionsCLI.fileFormat())).get();
-        generatorEbook.generate(ebook);
+        generatorEbook.generate(ebook, optionsCLI.outputFile());
     }
 
 }
