@@ -7,6 +7,7 @@ import br.com.unipds.cotuba.domain.EbookBuilder;
 import br.com.unipds.cotuba.domain.Markdown;
 import br.com.unipds.cotuba.dto.CotubaParams;
 import br.com.unipds.cotuba.dto.EbookProperties;
+import br.com.unipds.cotuba.ports.in.CotubaUseCase;
 import br.com.unipds.cotuba.ports.out.GeneratorEbook;
 import br.com.unipds.cotuba.ports.out.MarkdownRepository;
 import br.com.unipds.cotuba.ports.out.ReaderPropertiesEbook;
@@ -22,7 +23,7 @@ import java.util.List;
 
 @Service
 @ApplicationScoped
-public class CotubaService {
+public class CotubaService implements CotubaUseCase {
 
     private final RenderMarkdown renderMarkdown;
     private final ReaderPropertiesEbook readerPropertiesEbook;
@@ -37,6 +38,7 @@ public class CotubaService {
         this.generatorEbooks = generatorEbooks;
     }
 
+    @Override
     public void executar(CotubaParams optionsCLI) {
         List<Markdown> markdowns = markdownRepository.get(optionsCLI.directoryMd());
         List<Chapter> chapters = renderMarkdown.render(markdowns);

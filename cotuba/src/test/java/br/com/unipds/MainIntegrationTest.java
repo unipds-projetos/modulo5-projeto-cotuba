@@ -1,6 +1,6 @@
 package br.com.unipds;
 
-import br.com.unipds.cotuba.cli.Main;
+import br.com.unipds.cotuba.addapters.in.cli.Main;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.canvas.parser.PdfTextExtractor;
