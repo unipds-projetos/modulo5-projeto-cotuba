@@ -28,4 +28,36 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>br.com.unipds:cotuba</exclude>
+                                    <exclude>*:commons-cli</exclude>
+                                    <exclude>*:commonmark</exclude>
+                                    <exclude>*:epublib-core</exclude>
+                                    <exclude>com.itextpdf:*</exclude>
+                                    <exclude>org.jboss.weld.se:*</exclude>
+                                    <exclude>*:record-builder-core</exclude>
+                                    <exclude>org.jmolecules:*</exclude>
+                                </excludes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
