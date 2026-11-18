@@ -58,7 +58,7 @@ public class RenderMarkdownCommonmark implements RenderMarkdown {
                 for (CotubaPlugin plugin : ServiceLoader.load(CotubaPlugin.class)) {
                     String processedHtml = plugin.afterRender(html);
 
-                    if (processedHtml != null && processedHtml.isBlank()) {
+                    if (processedHtml != null && !processedHtml.isBlank()) {
                         html = processedHtml;
                     }
                 }
