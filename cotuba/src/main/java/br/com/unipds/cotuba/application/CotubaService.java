@@ -7,7 +7,7 @@ import br.com.unipds.cotuba.domain.EbookBuilder;
 import br.com.unipds.cotuba.domain.Markdown;
 import br.com.unipds.cotuba.dto.CotubaParams;
 import br.com.unipds.cotuba.dto.EbookProperties;
-import br.com.unipds.cotuba.plugin.CotubaPlugin;
+import br.com.unipds.cotuba.plugin.CotubaPluginAfterGenerate;
 import br.com.unipds.cotuba.ports.in.CotubaUseCase;
 import br.com.unipds.cotuba.ports.out.GeneratorEbook;
 import br.com.unipds.cotuba.ports.out.MarkdownRepository;
@@ -57,7 +57,7 @@ public class CotubaService implements CotubaUseCase {
         GeneratorEbook generatorEbook = generatorEbooks.select(EbookFormatFilter.of(optionsCLI.fileFormat())).get();
         generatorEbook.generate(ebook, optionsCLI.outputFile());
 
-        for (CotubaPlugin plugin : ServiceLoader.load(CotubaPlugin.class)) {
+        for (CotubaPluginAfterGenerate plugin : ServiceLoader.load(CotubaPluginAfterGenerate.class)) {
             plugin.afterGenerate(ebook);
         }
 
