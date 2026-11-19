@@ -30,7 +30,7 @@ public class PluginStatistics implements CotubaPlugin {
             }
         }
 
-        for (Map.Entry<String, Integer> count : wordCounter.entrySet()) {
+        for (Map.Entry<String, Integer> count : wordCounter.getEntrySet()) {
             String word = count.getKey();
             Integer value = count.getValue();
 
