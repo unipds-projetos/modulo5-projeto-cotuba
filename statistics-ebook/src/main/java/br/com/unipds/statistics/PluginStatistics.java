@@ -3,6 +3,7 @@ package br.com.unipds.statistics;
 import br.com.unipds.cotuba.domain.Ebook;
 import br.com.unipds.cotuba.plugin.CotubaPlugin;
 import br.com.unipds.cotuba.domain.Chapter;
+import br.com.unipds.statistics.dto.CountWord;
 import org.jsoup.Jsoup;
 
 import java.util.Map;
@@ -30,11 +31,8 @@ public class PluginStatistics implements CotubaPlugin {
             }
         }
 
-        for (Map.Entry<String, Integer> count : wordCounter.entrySet()) {
-            String word = count.getKey();
-            Integer value = count.getValue();
-
-            System.out.printf("'%s': '%d'%n", word, value);
+        for (CountWord countWord : wordCounter) {
+            System.out.printf("'%s': '%d'%n", countWord.word(), countWord.registers());
         }
     }
 
