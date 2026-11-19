@@ -1,19 +1,12 @@
 package br.com.unipds.statistics;
 
-import br.com.unipds.cotuba.domain.Ebook;
-import br.com.unipds.cotuba.plugin.CotubaPlugin;
 import br.com.unipds.cotuba.domain.Chapter;
+import br.com.unipds.cotuba.domain.Ebook;
+import br.com.unipds.cotuba.plugin.CotubaPluginAfterGenerate;
 import br.com.unipds.statistics.dto.CountWord;
 import org.jsoup.Jsoup;
 
-import java.util.Map;
-
-public class PluginStatistics implements CotubaPlugin {
-
-    @Override
-    public String afterRender(String s) {
-        return "";
-    }
+public class PluginStatistics implements CotubaPluginAfterGenerate {
 
     @Override
     public void afterGenerate(Ebook ebook) {
