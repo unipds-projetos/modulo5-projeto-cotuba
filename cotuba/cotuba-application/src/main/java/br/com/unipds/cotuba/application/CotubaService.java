@@ -1,6 +1,5 @@
 package br.com.unipds.cotuba.application;
 
-import br.com.unipds.cotuba.addapters.out.md.MarkdownRepositoryDirectory;
 import br.com.unipds.cotuba.domain.Chapter;
 import br.com.unipds.cotuba.domain.Ebook;
 import br.com.unipds.cotuba.domain.EbookBuilder;
@@ -33,7 +32,7 @@ public class CotubaService implements CotubaUseCase {
     private final Instance<GeneratorEbook> generatorEbooks;
 
     @Inject
-    public CotubaService(RenderMarkdown renderMarkdown, ReaderPropertiesEbook readerPropertiesEbook, MarkdownRepositoryDirectory markdownRepository, @Any Instance<GeneratorEbook> generatorEbooks) {
+    public CotubaService(RenderMarkdown renderMarkdown, ReaderPropertiesEbook readerPropertiesEbook, MarkdownRepository markdownRepository, @Any Instance<GeneratorEbook> generatorEbooks) {
         this.renderMarkdown = renderMarkdown;
         this.readerPropertiesEbook = readerPropertiesEbook;
         this.markdownRepository = markdownRepository;
