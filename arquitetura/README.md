@@ -72,3 +72,4 @@ Os leitores recebem recibos e notificações via email.
 ## Decisões Arquiteturais (ADRs)
 
 - [ADR 001: Geração de Ebooks via Mensageria Assincrona](adr/adr-001-geracao-ebooks-assincrona.md)
+- [ADR 002: Introdução de Cache em Memória para o Catálogo de E-Books](adr/adr-002-cache-catalogo.md)
