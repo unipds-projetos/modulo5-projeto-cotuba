@@ -69,3 +69,6 @@ Os leitores recebem recibos e notificações via email.
     Rel(gerador, storage, "Faz upload de PDF e EPUB gerados", "SSH")
 ```
 
+## Decisões Arquiteturais (ADRs)
+
+- [ADR 001: Geração de Ebooks via Mensageria Assincrona](adr/adr-001-geracao-ebooks-assincrona.md)
