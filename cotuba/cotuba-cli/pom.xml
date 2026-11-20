@@ -23,6 +23,31 @@
             <artifactId>cotuba-application</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>br.com.unipds</groupId>
+            <artifactId>cotuba-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>br.com.unipds</groupId>
+            <artifactId>cotuba-md</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>br.com.unipds</groupId>
+            <artifactId>cotuba-pdf</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>br.com.unipds</groupId>
+            <artifactId>cotuba-epub</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>br.com.unipds</groupId>
+            <artifactId>cotuba-html</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
