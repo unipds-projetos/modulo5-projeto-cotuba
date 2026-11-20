@@ -1,4 +1,4 @@
 @PrimaryAdapter
-package br.com.unipds.cotuba.addapters.in.cli;
+package br.com.unipds.cotuba.cli;
 
 import org.jmolecules.architecture.hexagonal.PrimaryAdapter;

@@ -1,4 +1,4 @@
-package br.com.unipds.cotuba.addapters.in.cli;
+package br.com.unipds.cotuba.cli;
 
 import br.com.unipds.cotuba.dto.CotubaParams;
 import br.com.unipds.cotuba.ports.in.CotubaUseCase;
