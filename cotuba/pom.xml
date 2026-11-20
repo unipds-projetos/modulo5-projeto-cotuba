@@ -11,6 +11,14 @@
     <packaging>pom</packaging>
     <modules>
         <module>cotuba-domain</module>
+        <module>cotuba-application</module>
+        <module>cotuba-plugin</module>
+        <module>cotuba-md</module>
+        <module>cotuba-config</module>
+        <module>cotuba-pdf</module>
+        <module>cotuba-html</module>
+        <module>cotuba-epub</module>
+        <module>cotuba-cli</module>
     </modules>
 
     <properties>
