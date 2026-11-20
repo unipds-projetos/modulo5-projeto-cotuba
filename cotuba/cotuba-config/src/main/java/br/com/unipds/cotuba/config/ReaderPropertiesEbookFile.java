@@ -1,4 +1,4 @@
-package br.com.unipds.cotuba.addapters.out.config;
+package br.com.unipds.cotuba.config;
 
 import br.com.unipds.cotuba.dto.EbookProperties;
 import br.com.unipds.cotuba.ports.out.ReaderPropertiesEbook;

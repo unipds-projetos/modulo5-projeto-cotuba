@@ -1,4 +1,4 @@
-package br.com.unipds.cotuba.addapters.out.html;
+package br.com.unipds.cotuba.html;
 
 import br.com.unipds.cotuba.support.EbookFormatQualifier;
 import br.com.unipds.cotuba.domain.Chapter;

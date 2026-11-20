@@ -1,4 +1,4 @@
-package br.com.unipds.cotuba.addapters.out.md;
+package br.com.unipds.cotuba.md;
 
 import br.com.unipds.cotuba.domain.Chapter;
 import br.com.unipds.cotuba.domain.ChapterBuilder;

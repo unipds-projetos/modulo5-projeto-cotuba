@@ -1,4 +1,4 @@
-package br.com.unipds.cotuba.addapters.out.epub;
+package br.com.unipds.cotuba.epub;
 
 import br.com.unipds.cotuba.support.EbookFormatQualifier;
 import br.com.unipds.cotuba.domain.Chapter;
