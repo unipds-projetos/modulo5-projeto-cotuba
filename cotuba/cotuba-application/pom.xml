@@ -23,6 +23,12 @@
             <artifactId>cotuba-domain</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>br.com.unipds</groupId>
+            <artifactId>cotuba-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
