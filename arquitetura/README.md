@@ -39,34 +39,42 @@ Os leitores recebem recibos e notificações via email.
         Person(autor, "Autor")
         Person(leitor, "Leitor")
 
-        System_Ext(git, "Provedor de Git Externo", "Armazenar o código fonte Mardown e Imagens dos livros")
-        System_Ext(pagamento, "Stripe - Gatway de Pagamentos", "Processar pagamento de venda - Pix e Cartão de Crédito")
-        System_Ext(email, "AWS SES - Sistema de Email externo", "Enviar recibos, notificações e avisos para os usuários")
-
         System_Boundary(cotubify, "Cotubify", "Gerenciar venda de ebooks, geração e publicação de ebooks") {
             Container(webapp, "Front-End", "UI dos Autores e Leitores")
             Container(api, "API Principal", "Regras de negócio, catalogo de vendas, segurança, financeiro")
 
-            Container(gerador, "Serviço Gerador de Eooks", "Java, Spring Boot", "Serviço que transofrma arquivos Markdown para PDF e EPUB")
+            Container(gerador, "Serviço Gerador de Eooks - Worker", "Java, Spring Boot", "Serviço que transofrma arquivos Markdown para PDF e EPUB")
 
             ContainerDb(db, "BD Relacional", "PostgreSQL - AWS RDS", "Armazenar dados financeiros dos usuários, catalogo de livros")
+
+            ContainerQueue(broker, "Message Broker", "AWS SQS", "Fila de mensagens assincronas para desacoplar tarefas pesadas.")
+
+            ContainerDb(cache, "Cache em Memória", "Redis - AWS Elasticache", "Armazena o catálogo de livros mais vendidos Top 100 par aleitura ultrarapida.")
+
             ContainerDb(storage, "Armazenamento de Arquivos", "Object Storage - AWS S3", "Capas dos Livros, PDF, EPUB - binários")
         }
 
-    Rel(autor, webapp, "", "HTTPS")
-    Rel(leitor, webapp, "", "HTTPS")
+        Rel(autor, webapp, "", "HTTPS")
+        Rel(leitor, webapp, "", "HTTPS")
 
-    Rel(webapp, api, "", "HTTPS/JSON")
-    Rel(webapp, storage, "Faz download de ebooks e imagens", "HTTPS")
+        Rel(webapp, api, "", "HTTPS/JSON")
+        Rel(webapp, storage, "Faz download de ebooks e imagens", "HTTPS")
 
-    Rel(api, db, "Transacional, queries", "JDBC")
-    Rel(api, pagamento, "Processar pagamentos", "HTTP/JSON")
-    Rel(api, email, "Envia dados para enviar avisos, notificações e recibos", "HTTP/JSON")
-    Rel(api, storage, "Salvar capa dos livros e PDF e gerar URLs de Download", "S3 API")
-    Rel(api, gerador, "Solicita geração dos Ebooks pesados", "HTTP/JSON")
+        Rel(api, cache, "Lê/Escreve catálogo em cache - Cache-Aside", "TCP")
+        Rel(api, db, "Transacional, queries", "JDBC")
+        Rel(api, pagamento, "Processar pagamentos", "HTTP/JSON")
+        Rel(api, email, "Envia dados para enviar avisos, notificações e recibos", "HTTP/JSON")
+        Rel(api, storage, "Salvar capa dos livros e PDF e gerar URLs de Download", "S3 API")
+        Rel(api, broker, "Solicita geração dos Ebooks pesados", "TCP???")
 
-    Rel(gerador, git, "Clona repositorio do livro", "SSH")
-    Rel(gerador, storage, "Faz upload de PDF e EPUB gerados", "SSH")
+        Rel(gerador, git, "Clona repositorio do livro", "SSH")
+        Rel(gerador, storage, "Faz upload de PDF e EPUB gerados", "SSH")
+        
+        Rel(broker, gerador, "GeracaoEbookCommand - conumido pelo gerador", "TCP???")
+
+        System_Ext(git, "Provedor de Git Externo", "Armazenar o código fonte Mardown e Imagens dos livros")
+        System_Ext(pagamento, "Stripe - Gatway de Pagamentos", "Processar pagamento de venda - Pix e Cartão de Crédito")
+        System_Ext(email, "AWS SES - Sistema de Email externo", "Enviar recibos, notificações e avisos para os usuários")
 ```
 
 ## Decisões Arquiteturais (ADRs)
