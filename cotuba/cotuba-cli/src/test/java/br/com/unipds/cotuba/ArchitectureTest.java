@@ -1,4 +1,4 @@
-package br.com.unipds;
+package br.com.unipds.cotuba;
 
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
