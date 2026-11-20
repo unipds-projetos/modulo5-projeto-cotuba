@@ -49,6 +49,18 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.jmolecules.integrations</groupId>
+            <artifactId>jmolecules-archunit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5</artifactId>
+            <version>1.4.1</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>commons-cli</groupId>
